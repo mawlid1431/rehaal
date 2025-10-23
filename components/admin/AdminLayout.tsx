@@ -171,19 +171,19 @@ export function AdminLayout({ children, currentSection, onSectionChange }: Admin
 
             {/* Welcome Banner */}
             <div className="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 border-b border-gray-200 dark:border-gray-700">
-                <div className="max-w-full px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex items-center justify-between">
+                <div className="max-w-full px-2 sm:px-4 lg:px-8 py-3 sm:py-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                            <h2 className="text-lg sm:text-2xl font-bold text-gray-800 dark:text-white">
                                 Welcome back, <span style={{ color: 'rgb(216, 167, 40)' }}>{adminName}</span>!
                             </h2>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
                                 Manage your travel business from here
                             </p>
                         </div>
-                        <div className="hidden sm:block">
+                        <div className="hidden md:block">
                             <div className="text-right">
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                                     {new Date().toLocaleDateString('en-US', {
                                         weekday: 'long',
                                         year: 'numeric',
@@ -199,22 +199,22 @@ export function AdminLayout({ children, currentSection, onSectionChange }: Admin
 
             {/* Secondary Navigation - Section Tabs */}
             <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-16 z-40 shadow-sm">
-                <div className="max-w-full px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-2 overflow-x-auto py-3 scrollbar-hide">
+                <div className="max-w-full px-2 sm:px-4 lg:px-8">
+                    <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto py-2 sm:py-3 scrollbar-hide">
                         {menuItems.map((item) => {
                             const Icon = item.icon;
                             return (
                                 <button
                                     key={item.id}
                                     onClick={() => onSectionChange(item.id)}
-                                    className={`flex items-center gap-2 px-5 py-2.5 rounded-lg transition-all whitespace-nowrap font-medium ${currentSection === item.id
+                                    className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg transition-all whitespace-nowrap font-medium text-sm sm:text-base ${currentSection === item.id
                                         ? 'text-white shadow-md'
                                         : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
                                         }`}
                                     style={currentSection === item.id ? { backgroundColor: 'rgb(216, 167, 40)' } : {}}
                                 >
-                                    <Icon className="w-5 h-5" />
-                                    <span>{item.label}</span>
+                                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                                    <span className="hidden xs:inline">{item.label}</span>
                                 </button>
                             );
                         })}
@@ -223,7 +223,7 @@ export function AdminLayout({ children, currentSection, onSectionChange }: Admin
             </div>
 
             {/* Page Content */}
-            <main className="max-w-full px-4 sm:px-6 lg:px-8 py-6">
+            <main className="max-w-full px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
                 {children}
             </main>
         </div>
