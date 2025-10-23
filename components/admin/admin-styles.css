@@ -1,0 +1,26 @@
+/* Rehaal Admin Brand Colors */
+.btn-brand {
+    background-color: rgb(216, 167, 40);
+    color: white;
+    transition: background-color 0.2s;
+}
+
+.btn-brand:hover {
+    background-color: rgb(186, 137, 10);
+}
+
+.text-brand {
+    color: rgb(216, 167, 40);
+}
+
+.bg-brand {
+    background-color: rgb(216, 167, 40);
+}
+
+.bg-brand-light {
+    background-color: rgba(216, 167, 40, 0.15);
+}
+
+.border-brand {
+    border-color: rgb(216, 167, 40);
+}

@@ -57,6 +57,7 @@
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",
     "vaul": "^0.9.2",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -64,6 +65,7 @@
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
+    "@types/xlsx": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "@vitejs/plugin-react": "^4.3.1",

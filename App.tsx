@@ -15,18 +15,31 @@ import { TermsPage } from './components/pages/TermsPage';
 import { PrivacyPage } from './components/pages/PrivacyPage';
 import { ServicesPage } from './components/pages/ServicesPage';
 import { BookingPage } from './components/pages/BookingPage';
+import { AdminPage } from './components/pages/AdminPage';
 import { Toaster } from './components/ui/sonner';
 
-type Page = 'home' | 'about' | 'services' | 'trips' | 'trip-detail' | 'booking' | 'gallery' | 'testimonials' | 'contact' | 'faq' | 'terms' | 'privacy';
+type Page = 'home' | 'about' | 'services' | 'trips' | 'trip-detail' | 'booking' | 'gallery' | 'testimonials' | 'contact' | 'faq' | 'terms' | 'privacy' | 'admin';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>('home');
+  const [currentPage, setCurrentPage] = useState<Page>(() => {
+    // Check if URL is /admin
+    if (window.location.pathname === '/admin') {
+      return 'admin';
+    }
+    return 'home';
+  });
   const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
 
   const handleNavigate = (page: string, id?: number) => {
     setCurrentPage(page as Page);
     if (id) {
       setSelectedTripId(id);
+    }
+    // Update URL for admin page
+    if (page === 'admin') {
+      window.history.pushState({}, '', '/admin');
+    } else if (window.location.pathname === '/admin') {
+      window.history.pushState({}, '', '/');
     }
     // Scroll to top on navigation
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -71,10 +84,24 @@ export default function App() {
         return <TermsPage />;
       case 'privacy':
         return <PrivacyPage />;
+      case 'admin':
+        return <AdminPage />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
   };
+
+  // Admin page has its own layout
+  if (currentPage === 'admin') {
+    return (
+      <DarkModeProvider>
+        <LanguageProvider>
+          <AdminPage />
+          <Toaster position="top-right" richColors />
+        </LanguageProvider>
+      </DarkModeProvider>
+    );
+  }
 
   return (
     <DarkModeProvider>
