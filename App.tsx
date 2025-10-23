@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { DarkModeProvider, LanguageProvider } from './lib/contexts';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';

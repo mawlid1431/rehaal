@@ -8,7 +8,7 @@ import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 interface TripDetailPageProps {
   tripId: number;
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, id?: number) => void;
 }
 
 export const TripDetailPage: React.FC<TripDetailPageProps> = ({ tripId, onNavigate }) => {
@@ -160,7 +160,9 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({ tripId, onNaviga
                   <Button
                     className="w-full mb-3"
                     style={{ backgroundColor: 'rgb(216, 167, 40)' }}
-                    onClick={() => onNavigate('booking', tripId)}
+                    onClick={() => {
+                      onNavigate('booking', tripId);
+                    }}
                   >
                     Book This Trip
                   </Button>
