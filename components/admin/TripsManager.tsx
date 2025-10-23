@@ -192,15 +192,45 @@ function TripForm({ trip, onClose, onSave }: any) {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Image URL
+                                Upload Image
                             </label>
-                            <input
-                                type="url"
-                                value={formData.image}
-                                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                                required
-                            />
+                            <div className="space-y-3">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                setFormData({ ...formData, image: reader.result as string });
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-gray-600 dark:file:text-gray-200"
+                                />
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                                    Or enter image URL:
+                                </div>
+                                <input
+                                    type="url"
+                                    value={formData.image}
+                                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                    placeholder="https://example.com/image.jpg"
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                                />
+                                {formData.image && (
+                                    <div className="mt-2">
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Preview:</p>
+                                        <img
+                                            src={formData.image}
+                                            alt="Preview"
+                                            className="w-full h-48 object-cover rounded-lg border border-gray-300 dark:border-gray-600"
+                                        />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

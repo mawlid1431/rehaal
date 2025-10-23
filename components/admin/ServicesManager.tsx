@@ -94,6 +94,34 @@ function ServiceForm({ service, onClose, onSave }: any) {
         icon: '✨'
     });
 
+    // Service-related icons
+    const iconOptions = [
+        { value: '🕊️', label: '🕊️ Dove (Peace/Sincerity)' },
+        { value: '🤝', label: '🤝 Handshake (Trust)' },
+        { value: '🌍', label: '🌍 Globe (Community)' },
+        { value: '📖', label: '📖 Book (Knowledge)' },
+        { value: '💫', label: '💫 Sparkles (Excellence)' },
+        { value: '⭐', label: '⭐ Star (Experience)' },
+        { value: '✈️', label: '✈️ Airplane (Flights)' },
+        { value: '🏨', label: '🏨 Hotel (Accommodation)' },
+        { value: '🛂', label: '🛂 Passport (Visa)' },
+        { value: '🚌', label: '🚌 Bus (Transportation)' },
+        { value: '🗺️', label: '🗺️ Map (Tours)' },
+        { value: '👥', label: '👥 People (Group)' },
+        { value: '🕋', label: '🕋 Kaaba (Umrah/Hajj)' },
+        { value: '🌙', label: '🌙 Crescent (Islamic)' },
+        { value: '📱', label: '📱 Phone (Support)' },
+        { value: '💳', label: '💳 Card (Payment)' },
+        { value: '🎓', label: '🎓 Graduate (Education)' },
+        { value: '🏆', label: '🏆 Trophy (Quality)' },
+        { value: '✅', label: '✅ Check (Guarantee)' },
+        { value: '🌟', label: '🌟 Glowing Star (Premium)' },
+        { value: '🎯', label: '🎯 Target (Goal)' },
+        { value: '💼', label: '💼 Briefcase (Professional)' },
+        { value: '🔒', label: '🔒 Lock (Security)' },
+        { value: '⏰', label: '⏰ Clock (24/7)' },
+    ];
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSave(formData);
@@ -101,7 +129,7 @@ function ServiceForm({ service, onClose, onSave }: any) {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-lg w-full">
+            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
                     <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">
                         {service ? 'Edit Service' : 'Add New Service'}
@@ -109,16 +137,24 @@ function ServiceForm({ service, onClose, onSave }: any) {
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Icon (Emoji)
+                                Select Icon
                             </label>
-                            <input
-                                type="text"
+                            <select
                                 value={formData.icon}
                                 onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                                placeholder="🕊️"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white text-lg"
                                 required
-                            />
+                            >
+                                {iconOptions.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
+                                <span className="text-5xl">{formData.icon}</span>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Preview</p>
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
