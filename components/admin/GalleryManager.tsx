@@ -5,7 +5,7 @@ import { galleryImages as initialGallery } from '../../lib/data';
 export function GalleryManager() {
     const [gallery, setGallery] = useState(initialGallery);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [editingImage, setEditingImage] = useState<any>(null);
+    const [editingImage, setEditingImage] = useState<typeof initialGallery[0] | null>(null);
 
     const handleDelete = (id: number) => {
         if (confirm('Are you sure you want to delete this image?')) {
@@ -13,7 +13,7 @@ export function GalleryManager() {
         }
     };
 
-    const handleEdit = (image: any) => {
+    const handleEdit = (image: typeof initialGallery[0]) => {
         setEditingImage(image);
         setIsFormOpen(true);
     };
@@ -40,7 +40,7 @@ export function GalleryManager() {
                 <ImageForm
                     image={editingImage}
                     onClose={() => setIsFormOpen(false)}
-                    onSave={(image) => {
+                    onSave={(image: typeof initialGallery[0]) => {
                         if (editingImage) {
                             setGallery(gallery.map(img => img.id === image.id ? image : img));
                         } else {
@@ -93,7 +93,11 @@ export function GalleryManager() {
     );
 }
 
-function ImageForm({ image, onClose, onSave }: any) {
+function ImageForm({ image, onClose, onSave }: {
+    image: typeof initialGallery[0] | null;
+    onClose: () => void;
+    onSave: (image: typeof initialGallery[0]) => void;
+}) {
     const [formData, setFormData] = useState(image || {
         url: '',
         title: '',
@@ -102,7 +106,7 @@ function ImageForm({ image, onClose, onSave }: any) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(formData);
+        onSave({ ...formData, id: 'id' in formData ? formData.id : 0 });
     };
 
     return (

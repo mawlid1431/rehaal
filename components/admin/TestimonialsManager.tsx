@@ -5,7 +5,7 @@ import { testimonials as initialTestimonials } from '../../lib/data';
 export function TestimonialsManager() {
     const [testimonials, setTestimonials] = useState(initialTestimonials);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [editingTestimonial, setEditingTestimonial] = useState<any>(null);
+    const [editingTestimonial, setEditingTestimonial] = useState<typeof initialTestimonials[0] | null>(null);
 
     const handleDelete = (id: number) => {
         if (confirm('Are you sure you want to delete this testimonial?')) {
@@ -13,7 +13,7 @@ export function TestimonialsManager() {
         }
     };
 
-    const handleEdit = (testimonial: any) => {
+    const handleEdit = (testimonial: typeof initialTestimonials[0]) => {
         setEditingTestimonial(testimonial);
         setIsFormOpen(true);
     };
@@ -40,7 +40,7 @@ export function TestimonialsManager() {
                 <TestimonialForm
                     testimonial={editingTestimonial}
                     onClose={() => setIsFormOpen(false)}
-                    onSave={(testimonial) => {
+                    onSave={(testimonial: typeof initialTestimonials[0]) => {
                         if (editingTestimonial) {
                             setTestimonials(testimonials.map(t => t.id === testimonial.id ? testimonial : t));
                         } else {
@@ -102,7 +102,11 @@ export function TestimonialsManager() {
     );
 }
 
-function TestimonialForm({ testimonial, onClose, onSave }: any) {
+function TestimonialForm({ testimonial, onClose, onSave }: {
+    testimonial: typeof initialTestimonials[0] | null;
+    onClose: () => void;
+    onSave: (testimonial: typeof initialTestimonials[0]) => void;
+}) {
     const [formData, setFormData] = useState(testimonial || {
         name: '',
         rating: 5,
@@ -113,7 +117,7 @@ function TestimonialForm({ testimonial, onClose, onSave }: any) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(formData);
+        onSave({ ...formData, id: 'id' in formData ? formData.id : 0 });
     };
 
     return (

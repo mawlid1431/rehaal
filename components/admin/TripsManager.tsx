@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2 } from 'lucide-react';
 import { trips as initialTrips } from '../../lib/data';
 
 export function TripsManager() {
     const [trips, setTrips] = useState(initialTrips);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [editingTrip, setEditingTrip] = useState<any>(null);
+    const [editingTrip, setEditingTrip] = useState<typeof initialTrips[0] | null>(null);
 
     const handleDelete = (id: number) => {
         if (confirm('Are you sure you want to delete this trip?')) {
@@ -13,7 +13,7 @@ export function TripsManager() {
         }
     };
 
-    const handleEdit = (trip: any) => {
+    const handleEdit = (trip: typeof initialTrips[0]) => {
         setEditingTrip(trip);
         setIsFormOpen(true);
     };
@@ -40,7 +40,7 @@ export function TripsManager() {
                 <TripForm
                     trip={editingTrip}
                     onClose={() => setIsFormOpen(false)}
-                    onSave={(trip) => {
+                    onSave={(trip: typeof initialTrips[0]) => {
                         if (editingTrip) {
                             setTrips(trips.map(t => t.id === trip.id ? trip : t));
                         } else {
@@ -103,7 +103,11 @@ export function TripsManager() {
     );
 }
 
-function TripForm({ trip, onClose, onSave }: any) {
+function TripForm({ trip, onClose, onSave }: {
+    trip: typeof initialTrips[0] | null;
+    onClose: () => void;
+    onSave: (trip: typeof initialTrips[0]) => void;
+}) {
     const [formData, setFormData] = useState(trip || {
         title: '',
         destination: '',
@@ -117,7 +121,7 @@ function TripForm({ trip, onClose, onSave }: any) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(formData);
+        onSave({ ...formData, id: 'id' in formData ? formData.id : 0 });
     };
 
     return (

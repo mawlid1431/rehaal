@@ -5,7 +5,7 @@ import { aboutCards as initialServices } from '../../lib/data';
 export function ServicesManager() {
     const [services, setServices] = useState(initialServices);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [editingService, setEditingService] = useState<any>(null);
+    const [editingService, setEditingService] = useState<typeof initialServices[0] | null>(null);
 
     const handleDelete = (id: number) => {
         if (confirm('Are you sure you want to delete this service?')) {
@@ -13,7 +13,7 @@ export function ServicesManager() {
         }
     };
 
-    const handleEdit = (service: any) => {
+    const handleEdit = (service: typeof initialServices[0]) => {
         setEditingService(service);
         setIsFormOpen(true);
     };
@@ -40,7 +40,7 @@ export function ServicesManager() {
                 <ServiceForm
                     service={editingService}
                     onClose={() => setIsFormOpen(false)}
-                    onSave={(service) => {
+                    onSave={(service: typeof initialServices[0]) => {
                         if (editingService) {
                             setServices(services.map(s => s.id === service.id ? service : s));
                         } else {
@@ -87,7 +87,11 @@ export function ServicesManager() {
     );
 }
 
-function ServiceForm({ service, onClose, onSave }: any) {
+function ServiceForm({ service, onClose, onSave }: {
+    service: typeof initialServices[0] | null;
+    onClose: () => void;
+    onSave: (service: typeof initialServices[0]) => void;
+}) {
     const [formData, setFormData] = useState(service || {
         title: '',
         description: '',
@@ -124,7 +128,7 @@ function ServiceForm({ service, onClose, onSave }: any) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(formData);
+        onSave({ ...formData, id: 'id' in formData ? formData.id : 0 });
     };
 
     return (
