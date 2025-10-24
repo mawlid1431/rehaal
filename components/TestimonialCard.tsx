@@ -4,14 +4,17 @@ import { Star } from 'lucide-react';
 
 interface TestimonialCardProps {
   testimonial: {
-    id: number;
-    name: string;
+    id: string;
+    customer_name: string;
     rating: number;
     comment: string;
     date: string;
-    trip: string;
+    trips?: {
+      title: string;
+    };
   };
   delay?: number;
+  index?: number;
 }
 
 export const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial, delay = 0 }) => {
@@ -57,9 +60,9 @@ export const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial, d
       <p className="text-muted-foreground mb-6 italic text-base leading-relaxed relative z-10">"{testimonial.comment}"</p>
 
       <div className="border-t border-[rgb(216,167,40)]/20 pt-4 relative z-10">
-        <p className="text-base font-semibold">{testimonial.name}</p>
-        <p className="text-sm text-muted-foreground mt-1">{testimonial.trip}</p>
-        <p className="text-xs text-[rgb(216,167,40)] mt-2">{testimonial.date}</p>
+        <p className="text-base font-semibold">{testimonial.customer_name}</p>
+        <p className="text-sm text-muted-foreground mt-1">{testimonial.trips?.title || 'General Review'}</p>
+        <p className="text-xs text-[rgb(216,167,40)] mt-2">{new Date(testimonial.date).toLocaleDateString()}</p>
       </div>
 
       <div className="absolute top-0 right-0 w-20 h-20 bg-[rgb(216,167,40)]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />

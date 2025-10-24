@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Calendar, Clock, MapPin, Check } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useLanguage } from '../../lib/contexts';
-import { trips } from '../../lib/data';
+import { tripsApi } from '../../lib/api';
+import { useState, useEffect } from 'react';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 interface TripDetailPageProps {
@@ -13,7 +14,31 @@ interface TripDetailPageProps {
 
 export const TripDetailPage: React.FC<TripDetailPageProps> = ({ tripId, onNavigate }) => {
   const { t } = useLanguage();
-  const trip = trips.find((t) => t.id === tripId);
+  const [trip, setTrip] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTrip();
+  }, [tripId]);
+
+  const fetchTrip = async () => {
+    try {
+      const data = await tripsApi.getById(tripId.toString());
+      setTrip(data);
+    } catch (error) {
+      console.error('Failed to fetch trip:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="pt-20 min-h-screen flex items-center justify-center">
+        <div className="text-center">Loading trip details...</div>
+      </div>
+    );
+  }
 
   if (!trip) {
     return (

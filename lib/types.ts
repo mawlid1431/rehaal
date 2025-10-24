@@ -4,10 +4,12 @@ export interface Trip {
     destination: string
     start_date: string
     end_date: string
-    duration: number
+    duration: string
     price: number
     image_url: string | null
     description: string | null
+    available_slots: number
+    is_active: boolean
     created_at: string
     updated_at: string
 }
@@ -17,6 +19,7 @@ export interface Gallery {
     title: string
     image_url: string
     description: string | null
+    category: string
     created_at: string
     updated_at: string
 }
@@ -35,7 +38,7 @@ export interface Testimonial {
 export interface Service {
     id: string
     icon: string
-    title: string
+    name: string
     description: string
     created_at: string
     updated_at: string

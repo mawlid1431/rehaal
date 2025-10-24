@@ -1,19 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { aboutCards as initialServices } from '../../lib/data';
+import { servicesApi } from '../../lib/api';
+import { toast } from 'sonner';
 
 export function ServicesManager() {
-    const [services, setServices] = useState(initialServices);
+    const [services, setServices] = useState<any[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [editingService, setEditingService] = useState<typeof initialServices[0] | null>(null);
+    const [editingService, setEditingService] = useState<any | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this service?')) {
-            setServices(services.filter(s => s.id !== id));
+    useEffect(() => {
+        fetchServices();
+    }, []);
+
+    const fetchServices = async () => {
+        try {
+            const data = await servicesApi.getAll();
+            setServices(data);
+        } catch (error) {
+            toast.error('Failed to fetch services');
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleEdit = (service: typeof initialServices[0]) => {
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this service?')) return;
+
+        try {
+            await servicesApi.delete(id);
+            toast.success('Service deleted successfully');
+            fetchServices();
+        } catch (error) {
+            toast.error('Failed to delete service');
+            console.error(error);
+        }
+    };
+
+    const handleEdit = (service: any) => {
         setEditingService(service);
         setIsFormOpen(true);
     };
@@ -22,6 +47,10 @@ export function ServicesManager() {
         setEditingService(null);
         setIsFormOpen(true);
     };
+
+    if (loading) {
+        return <div className="text-sm text-gray-600 dark:text-gray-400">Loading services...</div>;
+    }
 
     return (
         <div>
@@ -40,13 +69,21 @@ export function ServicesManager() {
                 <ServiceForm
                     service={editingService}
                     onClose={() => setIsFormOpen(false)}
-                    onSave={(service: typeof initialServices[0]) => {
-                        if (editingService) {
-                            setServices(services.map(s => s.id === service.id ? service : s));
-                        } else {
-                            setServices([...services, { ...service, id: Math.max(...services.map(s => s.id)) + 1 }]);
+                    onSave={async (service: any) => {
+                        try {
+                            if (editingService) {
+                                await servicesApi.update(editingService.id, service);
+                                toast.success('Service updated successfully');
+                            } else {
+                                await servicesApi.create(service);
+                                toast.success('Service created successfully');
+                            }
+                            setIsFormOpen(false);
+                            fetchServices();
+                        } catch (error) {
+                            toast.error('Failed to save service');
+                            console.error(error);
                         }
-                        setIsFormOpen(false);
                     }}
                 />
             )}
@@ -59,7 +96,7 @@ export function ServicesManager() {
                     >
                         <div className="text-4xl mb-3">{service.icon}</div>
                         <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
-                            {service.title}
+                            {service.name}
                         </h3>
                         <p className="text-gray-600 dark:text-gray-300 mb-4">
                             {service.description}
@@ -88,12 +125,12 @@ export function ServicesManager() {
 }
 
 function ServiceForm({ service, onClose, onSave }: {
-    service: typeof initialServices[0] | null;
+    service: any | null;
     onClose: () => void;
-    onSave: (service: typeof initialServices[0]) => void;
+    onSave: (service: any) => void;
 }) {
     const [formData, setFormData] = useState(service || {
-        title: '',
+        name: '',
         description: '',
         icon: '✨'
     });
@@ -128,7 +165,7 @@ function ServiceForm({ service, onClose, onSave }: {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ ...formData, id: 'id' in formData ? formData.id : 0 });
+        onSave(formData);
     };
 
     return (
@@ -162,12 +199,12 @@ function ServiceForm({ service, onClose, onSave }: {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Title
+                                Service Name
                             </label>
                             <input
                                 type="text"
-                                value={formData.title}
-                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                value={formData.name}
+                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                                 required
                             />

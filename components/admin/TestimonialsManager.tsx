@@ -1,19 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Star } from 'lucide-react';
-import { testimonials as initialTestimonials } from '../../lib/data';
+import { testimonialsApi, tripsApi } from '../../lib/api';
+import { toast } from 'sonner';
 
 export function TestimonialsManager() {
-    const [testimonials, setTestimonials] = useState(initialTestimonials);
+    const [testimonials, setTestimonials] = useState<any[]>([]);
+    const [trips, setTrips] = useState<any[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [editingTestimonial, setEditingTestimonial] = useState<typeof initialTestimonials[0] | null>(null);
+    const [editingTestimonial, setEditingTestimonial] = useState<any | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this testimonial?')) {
-            setTestimonials(testimonials.filter(t => t.id !== id));
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const [testimonialsData, tripsData] = await Promise.all([
+                testimonialsApi.getAll(),
+                tripsApi.getAll()
+            ]);
+            setTestimonials(testimonialsData);
+            setTrips(tripsData);
+        } catch (error) {
+            toast.error('Failed to fetch data');
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleEdit = (testimonial: typeof initialTestimonials[0]) => {
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this testimonial?')) return;
+
+        try {
+            await testimonialsApi.delete(id);
+            toast.success('Testimonial deleted successfully');
+            fetchData();
+        } catch (error) {
+            toast.error('Failed to delete testimonial');
+            console.error(error);
+        }
+    };
+
+    const handleEdit = (testimonial: any) => {
         setEditingTestimonial(testimonial);
         setIsFormOpen(true);
     };
@@ -22,6 +52,10 @@ export function TestimonialsManager() {
         setEditingTestimonial(null);
         setIsFormOpen(true);
     };
+
+    if (loading) {
+        return <div className="text-sm text-gray-600 dark:text-gray-400">Loading testimonials...</div>;
+    }
 
     return (
         <div>
@@ -39,14 +73,23 @@ export function TestimonialsManager() {
             {isFormOpen && (
                 <TestimonialForm
                     testimonial={editingTestimonial}
+                    trips={trips}
                     onClose={() => setIsFormOpen(false)}
-                    onSave={(testimonial: typeof initialTestimonials[0]) => {
-                        if (editingTestimonial) {
-                            setTestimonials(testimonials.map(t => t.id === testimonial.id ? testimonial : t));
-                        } else {
-                            setTestimonials([...testimonials, { ...testimonial, id: Math.max(...testimonials.map(t => t.id)) + 1 }]);
+                    onSave={async (testimonial: any) => {
+                        try {
+                            if (editingTestimonial) {
+                                await testimonialsApi.update(editingTestimonial.id, testimonial);
+                                toast.success('Testimonial updated successfully');
+                            } else {
+                                await testimonialsApi.create(testimonial);
+                                toast.success('Testimonial created successfully');
+                            }
+                            setIsFormOpen(false);
+                            fetchData();
+                        } catch (error) {
+                            toast.error('Failed to save testimonial');
+                            console.error(error);
                         }
-                        setIsFormOpen(false);
                     }}
                 />
             )}
@@ -60,10 +103,10 @@ export function TestimonialsManager() {
                         <div className="flex justify-between items-start mb-3">
                             <div className="flex-1">
                                 <h3 className="font-semibold text-gray-800 dark:text-white">
-                                    {testimonial.name}
+                                    {testimonial.customer_name}
                                 </h3>
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    {testimonial.date}
+                                    {new Date(testimonial.date).toLocaleDateString()}
                                 </p>
                             </div>
                             <div className="flex gap-0.5">
@@ -73,7 +116,7 @@ export function TestimonialsManager() {
                             </div>
                         </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 line-clamp-1">
-                            {testimonial.trip}
+                            {testimonial.trips?.title || 'N/A'}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 flex-1 line-clamp-3">
                             {testimonial.comment}
@@ -102,22 +145,23 @@ export function TestimonialsManager() {
     );
 }
 
-function TestimonialForm({ testimonial, onClose, onSave }: {
-    testimonial: typeof initialTestimonials[0] | null;
+function TestimonialForm({ testimonial, trips, onClose, onSave }: {
+    testimonial: any | null;
+    trips: any[];
     onClose: () => void;
-    onSave: (testimonial: typeof initialTestimonials[0]) => void;
+    onSave: (testimonial: any) => void;
 }) {
     const [formData, setFormData] = useState(testimonial || {
-        name: '',
+        customer_name: '',
         rating: 5,
         comment: '',
         date: new Date().toISOString().split('T')[0],
-        trip: ''
+        trip_id: ''
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ ...formData, id: 'id' in formData ? formData.id : 0 });
+        onSave(formData);
     };
 
     return (
@@ -134,8 +178,8 @@ function TestimonialForm({ testimonial, onClose, onSave }: {
                             </label>
                             <input
                                 type="text"
-                                value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                value={formData.customer_name}
+                                onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                                 required
                             />
@@ -158,13 +202,19 @@ function TestimonialForm({ testimonial, onClose, onSave }: {
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Trip
                             </label>
-                            <input
-                                type="text"
-                                value={formData.trip}
-                                onChange={(e) => setFormData({ ...formData, trip: e.target.value })}
+                            <select
+                                value={formData.trip_id}
+                                onChange={(e) => setFormData({ ...formData, trip_id: e.target.value })}
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                                 required
-                            />
+                            >
+                                <option value="">Select a trip</option>
+                                {trips.map((trip) => (
+                                    <option key={trip.id} value={trip.id}>
+                                        {trip.title}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

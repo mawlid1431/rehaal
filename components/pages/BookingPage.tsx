@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Users, Mail, Phone, MapPin, User, CreditCard, MessageSquare } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
-import { trips } from '../../lib/data';
+import { tripsApi, bookingsApi } from '../../lib/api';
 import { toast } from 'sonner';
 
 interface BookingPageProps {
@@ -14,8 +14,25 @@ interface BookingPageProps {
 }
 
 export const BookingPage: React.FC<BookingPageProps> = ({ tripId, onNavigate }) => {
-    const trip = trips.find(t => t.id === tripId);
+    const [trip, setTrip] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        fetchTrip();
+    }, [tripId]);
+
+    const fetchTrip = async () => {
+        try {
+            const data = await tripsApi.getById(tripId.toString());
+            setTrip(data);
+        } catch (error) {
+            console.error('Failed to fetch trip:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -28,6 +45,14 @@ export const BookingPage: React.FC<BookingPageProps> = ({ tripId, onNavigate }) 
         emergencyContact: '',
         emergencyPhone: ''
     });
+
+    if (loading) {
+        return (
+            <div className="pt-20 min-h-screen flex items-center justify-center">
+                <div className="text-center">Loading booking form...</div>
+            </div>
+        );
+    }
 
     if (!trip) {
         return (

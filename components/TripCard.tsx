@@ -6,14 +6,16 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface TripCardProps {
   trip: {
-    id: number;
+    id: string;
     title: string;
     destination: string;
-    dates: string;
-    price: string;
-    image: string;
+    start_date: string;
+    end_date: string;
+    duration: string;
+    price: number;
+    image_url: string;
   };
-  onViewDetails: (id: number) => void;
+  onViewDetails: (id: string) => void;
 }
 
 export const TripCard: React.FC<TripCardProps> = ({ trip, onViewDetails }) => {
@@ -44,7 +46,7 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onViewDetails }) => {
           className="w-full h-full"
         >
           <ImageWithFallback
-            src={trip.image}
+            src={trip.image_url}
             alt={trip.title}
             className="w-full h-full object-cover"
           />
@@ -55,7 +57,7 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onViewDetails }) => {
           whileHover={{ scale: 1.1, rotate: 5 }}
           transition={{ duration: 0.3 }}
         >
-          {trip.price}
+          ${trip.price}
         </motion.div>
       </div>
 
@@ -77,7 +79,7 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onViewDetails }) => {
             transition={{ duration: 0.3 }}
           >
             <Calendar className="w-5 h-5 mr-3 text-[rgb(216,167,40)]" />
-            <span className="text-sm">{trip.dates}</span>
+            <span className="text-sm">{new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}</span>
           </motion.div>
         </div>
 

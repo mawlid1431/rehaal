@@ -1,19 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { trips as initialTrips } from '../../lib/data';
+import { tripsApi, uploadImage } from '../../lib/api';
+import { toast } from 'sonner';
 
 export function TripsManager() {
-    const [trips, setTrips] = useState(initialTrips);
+    const [trips, setTrips] = useState<any[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [editingTrip, setEditingTrip] = useState<typeof initialTrips[0] | null>(null);
+    const [editingTrip, setEditingTrip] = useState<any | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this trip?')) {
-            setTrips(trips.filter(trip => trip.id !== id));
+    useEffect(() => {
+        fetchTrips();
+    }, []);
+
+    const fetchTrips = async () => {
+        try {
+            const data = await tripsApi.getAll();
+            setTrips(data);
+        } catch (error) {
+            toast.error('Failed to fetch trips');
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleEdit = (trip: typeof initialTrips[0]) => {
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this trip?')) return;
+
+        try {
+            await tripsApi.delete(id);
+            toast.success('Trip deleted successfully');
+            fetchTrips();
+        } catch (error) {
+            toast.error('Failed to delete trip');
+            console.error(error);
+        }
+    };
+
+    const handleEdit = (trip: any) => {
         setEditingTrip(trip);
         setIsFormOpen(true);
     };
@@ -22,6 +47,10 @@ export function TripsManager() {
         setEditingTrip(null);
         setIsFormOpen(true);
     };
+
+    if (loading) {
+        return <div className="text-sm text-gray-600 dark:text-gray-400">Loading trips...</div>;
+    }
 
     return (
         <div>
@@ -40,13 +69,21 @@ export function TripsManager() {
                 <TripForm
                     trip={editingTrip}
                     onClose={() => setIsFormOpen(false)}
-                    onSave={(trip: typeof initialTrips[0]) => {
-                        if (editingTrip) {
-                            setTrips(trips.map(t => t.id === trip.id ? trip : t));
-                        } else {
-                            setTrips([...trips, { ...trip, id: Math.max(...trips.map(t => t.id)) + 1 }]);
+                    onSave={async (trip: any) => {
+                        try {
+                            if (editingTrip) {
+                                await tripsApi.update(editingTrip.id, trip);
+                                toast.success('Trip updated successfully');
+                            } else {
+                                await tripsApi.create(trip);
+                                toast.success('Trip created successfully');
+                            }
+                            setIsFormOpen(false);
+                            fetchTrips();
+                        } catch (error) {
+                            toast.error('Failed to save trip');
+                            console.error(error);
                         }
-                        setIsFormOpen(false);
                     }}
                 />
             )}
@@ -59,10 +96,15 @@ export function TripsManager() {
                     >
                         <div className="relative h-48">
                             <img
-                                src={trip.image}
+                                src={trip.image_url}
                                 alt={trip.title}
                                 className="w-full h-full object-cover"
                             />
+                            {!trip.is_active && (
+                                <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
+                                    Inactive
+                                </div>
+                            )}
                         </div>
                         <div className="p-4 flex-1 flex flex-col">
                             <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">
@@ -70,13 +112,16 @@ export function TripsManager() {
                             </h3>
                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{trip.destination}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">
-                                {trip.dates}
+                                {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
                             </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-500 mb-2">
+                            <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">
                                 {trip.duration}
                             </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-500 mb-2">
+                                Slots: {trip.available_slots}
+                            </p>
                             <p className="text-lg font-semibold mb-4" style={{ color: 'rgb(216, 167, 40)' }}>
-                                {trip.price}
+                                ${trip.price}
                             </p>
                             <div className="flex gap-2 mt-auto">
                                 <button
@@ -104,33 +149,41 @@ export function TripsManager() {
 }
 
 function TripForm({ trip, onClose, onSave }: {
-    trip: typeof initialTrips[0] | null;
+    trip: any | null;
     onClose: () => void;
-    onSave: (trip: typeof initialTrips[0]) => void;
+    onSave: (trip: any) => void;
 }) {
     const [formData, setFormData] = useState(trip || {
         title: '',
         destination: '',
-        dates: '',
+        start_date: '',
+        end_date: '',
         duration: '',
-        price: '',
-        image: '',
+        price: 0,
+        image_url: '',
         description: '',
-        includes: []
+        available_slots: 0,
+        is_active: true
     });
-    const [destinations, setDestinations] = useState<string[]>([formData.destination || '']);
-    const [durations, setDurations] = useState<string[]>([formData.duration || '']);
-    const [prices, setPrices] = useState<string[]>([formData.price || '']);
+    const [uploading, setUploading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const updatedData = {
-            ...formData,
-            destination: destinations.filter(d => d).join(', '),
-            duration: durations[0] || '',
-            price: prices[0] || ''
-        };
-        onSave({ ...updatedData, id: 'id' in formData ? formData.id : 0 });
+        onSave(formData);
+    };
+
+    const handleImageUpload = async (file: File) => {
+        try {
+            setUploading(true);
+            const url = await uploadImage(file);
+            setFormData({ ...formData, image_url: url });
+            toast.success('Image uploaded successfully');
+        } catch (error) {
+            toast.error('Failed to upload image');
+            console.error(error);
+        } finally {
+            setUploading(false);
+        }
     };
 
     return (
@@ -153,52 +206,40 @@ function TripForm({ trip, onClose, onSave }: {
                                 required
                             />
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Destination
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.destination}
+                                onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                                placeholder="Paris, France"
+                                required
+                            />
+                        </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Destination
-                                </label>
-                                {destinations.map((dest, index) => (
-                                    <div key={index} className="flex gap-2 mb-2">
-                                        <input
-                                            type="text"
-                                            value={dest}
-                                            onChange={(e) => {
-                                                const newDests = [...destinations];
-                                                newDests[index] = e.target.value;
-                                                setDestinations(newDests);
-                                            }}
-                                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                                            placeholder="Paris, France"
-                                            required
-                                        />
-                                        {destinations.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setDestinations(destinations.filter((_, i) => i !== index))}
-                                                className="px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                                            >
-                                                ×
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                                <button
-                                    type="button"
-                                    onClick={() => setDestinations([...destinations, ''])}
-                                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-                                >
-                                    + Add
-                                </button>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Dates
+                                    Start Date
                                 </label>
                                 <input
                                     type="date"
-                                    value={formData.dates}
-                                    onChange={(e) => setFormData({ ...formData, dates: e.target.value })}
+                                    value={formData.start_date}
+                                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    End Date
+                                </label>
+                                <input
+                                    type="date"
+                                    value={formData.end_date}
+                                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                                     required
                                 />
@@ -207,78 +248,43 @@ function TripForm({ trip, onClose, onSave }: {
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Duration
+                                    Duration (days)
                                 </label>
-                                {durations.map((dur, index) => (
-                                    <div key={index} className="flex gap-2 mb-2">
-                                        <input
-                                            type="text"
-                                            value={dur}
-                                            onChange={(e) => {
-                                                const newDurs = [...durations];
-                                                newDurs[index] = e.target.value;
-                                                setDurations(newDurs);
-                                            }}
-                                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                                            placeholder="7 days"
-                                            required
-                                        />
-                                        {durations.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setDurations(durations.filter((_, i) => i !== index))}
-                                                className="px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                                            >
-                                                ×
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                                <button
-                                    type="button"
-                                    onClick={() => setDurations([...durations, ''])}
-                                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-                                >
-                                    + Add
-                                </button>
+                                <input
+                                    type="text"
+                                    value={formData.duration}
+                                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                                    placeholder="7 days"
+                                    required
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Price
+                                    Price ($)
                                 </label>
-                                {prices.map((price, index) => (
-                                    <div key={index} className="flex gap-2 mb-2">
-                                        <input
-                                            type="text"
-                                            value={price}
-                                            onChange={(e) => {
-                                                const newPrices = [...prices];
-                                                newPrices[index] = e.target.value;
-                                                setPrices(newPrices);
-                                            }}
-                                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                                            placeholder="$1299"
-                                            required
-                                        />
-                                        {prices.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => setPrices(prices.filter((_, i) => i !== index))}
-                                                className="px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                                            >
-                                                ×
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                                <button
-                                    type="button"
-                                    onClick={() => setPrices([...prices, ''])}
-                                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-                                >
-                                    + Add
-                                </button>
+                                <input
+                                    type="number"
+                                    value={formData.price}
+                                    onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                                    placeholder="1299"
+                                    required
+                                />
                             </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Available Slots
+                            </label>
+                            <input
+                                type="number"
+                                value={formData.available_slots}
+                                onChange={(e) => setFormData({ ...formData, available_slots: parseInt(e.target.value) })}
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                                placeholder="20"
+                                required
+                            />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -291,30 +297,28 @@ function TripForm({ trip, onClose, onSave }: {
                                     onChange={(e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
-                                            const reader = new FileReader();
-                                            reader.onloadend = () => {
-                                                setFormData({ ...formData, image: reader.result as string });
-                                            };
-                                            reader.readAsDataURL(file);
+                                            handleImageUpload(file);
                                         }
                                     }}
+                                    disabled={uploading}
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-gray-600 dark:file:text-gray-200"
                                 />
+                                {uploading && <p className="text-sm text-blue-600">Uploading...</p>}
                                 <div className="text-xs text-gray-500 dark:text-gray-400">
                                     Or enter image URL:
                                 </div>
                                 <input
                                     type="url"
-                                    value={formData.image}
-                                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                    value={formData.image_url}
+                                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                                     placeholder="https://example.com/image.jpg"
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                                 />
-                                {formData.image && (
+                                {formData.image_url && (
                                     <div className="mt-2">
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Preview:</p>
                                         <img
-                                            src={formData.image}
+                                            src={formData.image_url}
                                             alt="Preview"
                                             className="w-full h-48 object-cover rounded-lg border border-gray-300 dark:border-gray-600"
                                         />
@@ -333,6 +337,18 @@ function TripForm({ trip, onClose, onSave }: {
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                                 required
                             />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id="is_active"
+                                checked={formData.is_active}
+                                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                                className="w-4 h-4 text-blue-600 rounded"
+                            />
+                            <label htmlFor="is_active" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Active (visible on website)
+                            </label>
                         </div>
                         <div className="flex gap-2 justify-end">
                             <button

@@ -1,9 +1,27 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { TestimonialCard } from '../TestimonialCard';
-import { testimonials } from '../../lib/data';
+import { testimonialsApi } from '../../lib/api';
+import { useState, useEffect } from 'react';
 
 export const TestimonialsPage: React.FC = () => {
+  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
+
+  const fetchTestimonials = async () => {
+    try {
+      const data = await testimonialsApi.getAll();
+      setTestimonials(data);
+    } catch (error) {
+      console.error('Failed to fetch testimonials:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="pt-20">
       {/* Hero Section */}
@@ -30,13 +48,19 @@ export const TestimonialsPage: React.FC = () => {
       <section className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <TestimonialCard
-                key={testimonial.id}
-                testimonial={testimonial}
-                delay={index * 0.1}
-              />
-            ))}
+            {loading ? (
+              <div className="col-span-3 text-center py-12">Loading testimonials...</div>
+            ) : testimonials.length === 0 ? (
+              <div className="col-span-3 text-center py-12">No testimonials available yet.</div>
+            ) : (
+              testimonials.map((testimonial, index) => (
+                <TestimonialCard
+                  key={testimonial.id}
+                  testimonial={testimonial}
+                  delay={index * 0.1}
+                />
+              ))
+            )}
           </div>
         </div>
       </section>

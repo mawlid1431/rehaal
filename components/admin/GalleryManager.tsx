@@ -1,19 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Trash2, Edit } from 'lucide-react';
-import { galleryImages as initialGallery } from '../../lib/data';
+import { galleryApi, uploadImage } from '../../lib/api';
+import { toast } from 'sonner';
 
 export function GalleryManager() {
-    const [gallery, setGallery] = useState(initialGallery);
+    const [gallery, setGallery] = useState<any[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [editingImage, setEditingImage] = useState<typeof initialGallery[0] | null>(null);
+    const [editingImage, setEditingImage] = useState<any | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this image?')) {
-            setGallery(gallery.filter(img => img.id !== id));
+    useEffect(() => {
+        fetchGallery();
+    }, []);
+
+    const fetchGallery = async () => {
+        try {
+            const data = await galleryApi.getAll();
+            setGallery(data);
+        } catch (error) {
+            toast.error('Failed to fetch gallery');
+            console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const handleEdit = (image: typeof initialGallery[0]) => {
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this image?')) return;
+
+        try {
+            await galleryApi.delete(id);
+            toast.success('Image deleted successfully');
+            fetchGallery();
+        } catch (error) {
+            toast.error('Failed to delete image');
+            console.error(error);
+        }
+    };
+
+    const handleEdit = (image: any) => {
         setEditingImage(image);
         setIsFormOpen(true);
     };
@@ -22,6 +47,10 @@ export function GalleryManager() {
         setEditingImage(null);
         setIsFormOpen(true);
     };
+
+    if (loading) {
+        return <div className="text-sm text-gray-600 dark:text-gray-400">Loading gallery...</div>;
+    }
 
     return (
         <div>
@@ -40,13 +69,21 @@ export function GalleryManager() {
                 <ImageForm
                     image={editingImage}
                     onClose={() => setIsFormOpen(false)}
-                    onSave={(image: typeof initialGallery[0]) => {
-                        if (editingImage) {
-                            setGallery(gallery.map(img => img.id === image.id ? image : img));
-                        } else {
-                            setGallery([...gallery, { ...image, id: Math.max(...gallery.map(img => img.id)) + 1 }]);
+                    onSave={async (image: any) => {
+                        try {
+                            if (editingImage) {
+                                await galleryApi.update(editingImage.id, image);
+                                toast.success('Image updated successfully');
+                            } else {
+                                await galleryApi.create(image);
+                                toast.success('Image added successfully');
+                            }
+                            setIsFormOpen(false);
+                            fetchGallery();
+                        } catch (error) {
+                            toast.error('Failed to save image');
+                            console.error(error);
                         }
-                        setIsFormOpen(false);
                     }}
                 />
             )}
@@ -59,7 +96,7 @@ export function GalleryManager() {
                     >
                         <div className="relative">
                             <img
-                                src={image.url}
+                                src={image.image_url}
                                 alt={image.title}
                                 className="w-full h-48 object-cover"
                             />
@@ -94,19 +131,35 @@ export function GalleryManager() {
 }
 
 function ImageForm({ image, onClose, onSave }: {
-    image: typeof initialGallery[0] | null;
+    image: any | null;
     onClose: () => void;
-    onSave: (image: typeof initialGallery[0]) => void;
+    onSave: (image: any) => void;
 }) {
     const [formData, setFormData] = useState(image || {
-        url: '',
+        image_url: '',
         title: '',
-        description: ''
+        description: '',
+        category: 'general'
     });
+    const [uploading, setUploading] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ ...formData, id: 'id' in formData ? formData.id : 0 });
+        onSave(formData);
+    };
+
+    const handleImageUpload = async (file: File) => {
+        try {
+            setUploading(true);
+            const url = await uploadImage(file);
+            setFormData({ ...formData, image_url: url });
+            toast.success('Image uploaded successfully');
+        } catch (error) {
+            toast.error('Failed to upload image');
+            console.error(error);
+        } finally {
+            setUploading(false);
+        }
     };
 
     return (
@@ -128,22 +181,20 @@ function ImageForm({ image, onClose, onSave }: {
                                     onChange={(e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
-                                            const reader = new FileReader();
-                                            reader.onloadend = () => {
-                                                setFormData({ ...formData, url: reader.result as string });
-                                            };
-                                            reader.readAsDataURL(file);
+                                            handleImageUpload(file);
                                         }
                                     }}
+                                    disabled={uploading}
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 dark:file:bg-gray-600 dark:file:text-gray-200"
                                 />
+                                {uploading && <p className="text-sm text-blue-600">Uploading...</p>}
                                 <div className="text-xs text-gray-500 dark:text-gray-400">
                                     Or enter image URL:
                                 </div>
                                 <input
                                     type="url"
-                                    value={formData.url}
-                                    onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                                    value={formData.image_url}
+                                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                                     placeholder="https://example.com/image.jpg"
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                                 />
@@ -173,12 +224,27 @@ function ImageForm({ image, onClose, onSave }: {
                                 required
                             />
                         </div>
-                        {formData.url && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Category
+                            </label>
+                            <select
+                                value={formData.category}
+                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                            >
+                                <option value="general">General</option>
+                                <option value="trips">Trips</option>
+                                <option value="destinations">Destinations</option>
+                                <option value="activities">Activities</option>
+                            </select>
+                        </div>
+                        {formData.image_url && (
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Preview
                                 </label>
-                                <img src={formData.url} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
+                                <img src={formData.image_url} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
                             </div>
                         )}
                         <div className="flex gap-2 justify-end">

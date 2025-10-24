@@ -5,7 +5,8 @@ import { TripCard } from '../TripCard';
 import { TestimonialCard } from '../TestimonialCard';
 import { Button } from '../ui/button';
 import { useLanguage } from '../../lib/contexts';
-import { aboutCards, trips, testimonials } from '../../lib/data';
+import { servicesApi, tripsApi, testimonialsApi } from '../../lib/api';
+import { useState, useEffect } from 'react';
 
 interface HomePageProps {
   onNavigate: (page: string, id?: number) => void;
@@ -14,6 +15,10 @@ interface HomePageProps {
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const { t } = useLanguage();
   const [currentBgSlide, setCurrentBgSlide] = React.useState(0);
+  const [aboutCards, setAboutCards] = useState<any[]>([]);
+  const [trips, setTrips] = useState<any[]>([]);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const motivationalBackgrounds = [
     'https://images.unsplash.com/photo-1591604466107-ec97de577aff?q=80&w=2071',
@@ -28,6 +33,27 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
     }, 8000);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const [servicesData, tripsData, testimonialsData] = await Promise.all([
+        servicesApi.getAll(),
+        tripsApi.getAll(),
+        testimonialsApi.getAll()
+      ]);
+      setAboutCards(servicesData);
+      setTrips(tripsData.filter((trip: any) => trip.is_active));
+      setTestimonials(testimonialsData);
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const scrollToTrips = () => {
     const element = document.getElementById('trips-section');
@@ -56,38 +82,42 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {aboutCards.slice(0, 3).map((card, index) => (
-              <motion.div
-                key={card.id}
-                initial={{ opacity: 0, y: 60, scale: 0.8, rotateX: -15 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{
-                  duration: 1.2,
-                  delay: index * 0.2,
-                  ease: [0.25, 0.46, 0.45, 0.94]
-                }}
-                whileHover={{
-                  y: -15,
-                  scale: 1.05,
-                  boxShadow: "0 25px 50px rgba(216, 167, 40, 0.3)",
-                  transition: { duration: 0.5, ease: "easeOut" }
-                }}
-                className="relative bg-gradient-to-br from-card via-card to-card/80 p-8 rounded-2xl shadow-xl text-center border-2 border-[rgb(216,167,40)]/20 hover:border-[rgb(216,167,40)]/60 transition-all overflow-hidden group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-[rgb(216,167,40)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            {loading ? (
+              <div className="col-span-3 text-center py-8">Loading services...</div>
+            ) : (
+              aboutCards.slice(0, 3).map((card, index) => (
                 <motion.div
-                  className="text-5xl mb-4 relative z-10"
-                  whileHover={{ scale: 1.3, rotate: 360 }}
-                  transition={{ duration: 1, type: "spring", stiffness: 150 }}
+                  key={card.id}
+                  initial={{ opacity: 0, y: 60, scale: 0.8, rotateX: -15 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{
+                    duration: 1.2,
+                    delay: index * 0.2,
+                    ease: [0.25, 0.46, 0.45, 0.94]
+                  }}
+                  whileHover={{
+                    y: -15,
+                    scale: 1.05,
+                    boxShadow: "0 25px 50px rgba(216, 167, 40, 0.3)",
+                    transition: { duration: 0.5, ease: "easeOut" }
+                  }}
+                  className="relative bg-gradient-to-br from-card via-card to-card/80 p-8 rounded-2xl shadow-xl text-center border-2 border-[rgb(216,167,40)]/20 hover:border-[rgb(216,167,40)]/60 transition-all overflow-hidden group"
                 >
-                  {card.icon}
+                  <div className="absolute inset-0 bg-gradient-to-br from-[rgb(216,167,40)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <motion.div
+                    className="text-5xl mb-4 relative z-10"
+                    whileHover={{ scale: 1.3, rotate: 360 }}
+                    transition={{ duration: 1, type: "spring", stiffness: 150 }}
+                  >
+                    {card.icon}
+                  </motion.div>
+                  <h3 className="mb-3 text-lg font-semibold relative z-10">{card.name}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed relative z-10">{card.description}</p>
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-[rgb(216,167,40)]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
                 </motion.div>
-                <h3 className="mb-3 text-lg font-semibold relative z-10">{card.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed relative z-10">{card.description}</p>
-                <div className="absolute top-0 right-0 w-20 h-20 bg-[rgb(216,167,40)]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
-              </motion.div>
-            ))}
+              ))
+            )}
           </div>
 
           <div className="text-center">
@@ -183,13 +213,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
-            {trips.slice(0, 3).map((trip) => (
-              <TripCard
-                key={trip.id}
-                trip={trip}
-                onViewDetails={(id) => onNavigate('trip-detail', id)}
-              />
-            ))}
+            {loading ? (
+              <div className="col-span-3 text-center py-8">Loading trips...</div>
+            ) : trips.length === 0 ? (
+              <div className="col-span-3 text-center py-8">No trips available at the moment.</div>
+            ) : (
+              trips.slice(0, 3).map((trip) => (
+                <TripCard
+                  key={trip.id}
+                  trip={trip}
+                  onViewDetails={(id) => onNavigate('trip-detail', id)}
+                />
+              ))
+            )}
           </div>
 
           <div className="text-center">
@@ -346,13 +382,19 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            {testimonials.slice(0, 3).map((testimonial, index) => (
-              <TestimonialCard
-                key={testimonial.id}
-                testimonial={testimonial}
-                delay={index * 0.1}
-              />
-            ))}
+            {loading ? (
+              <div className="col-span-3 text-center py-8">Loading testimonials...</div>
+            ) : testimonials.length === 0 ? (
+              <div className="col-span-3 text-center py-8">No testimonials available yet.</div>
+            ) : (
+              testimonials.slice(0, 3).map((testimonial, index) => (
+                <TestimonialCard
+                  key={testimonial.id}
+                  testimonial={testimonial}
+                  delay={index * 0.1}
+                />
+              ))
+            )}
           </div>
 
           <div className="text-center">
