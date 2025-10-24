@@ -89,60 +89,78 @@ export function TripsManager() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {trips.map((trip) => (
-                    <div
-                        key={trip.id}
-                        className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col"
-                    >
-                        <div className="relative h-48">
-                            <img
-                                src={trip.image_url}
-                                alt={trip.title}
-                                className="w-full h-full object-cover"
-                            />
-                            {!trip.is_active && (
-                                <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
-                                    Inactive
+                {trips.map((trip) => {
+                    // Check if trip is past
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const isPast = new Date(trip.end_date) < today;
+
+                    return (
+                        <div
+                            key={trip.id}
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col"
+                        >
+                            <div className="relative h-48">
+                                <img
+                                    src={trip.image_url}
+                                    alt={trip.title}
+                                    className={`w-full h-full object-cover ${isPast ? 'grayscale opacity-70' : ''}`}
+                                />
+                                <div className="absolute top-2 left-2 flex gap-2">
+                                    {isPast ? (
+                                        <div className="bg-gray-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-lg">
+                                            Past Trip
+                                        </div>
+                                    ) : (
+                                        <div className="bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-lg">
+                                            Upcoming
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                        <div className="p-4 flex-1 flex flex-col">
-                            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">
-                                {trip.title}
-                            </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{trip.destination}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">
-                                {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">
-                                {trip.duration}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-500 mb-2">
-                                Slots: {trip.available_slots}
-                            </p>
-                            <p className="text-lg font-semibold mb-4" style={{ color: 'rgb(216, 167, 40)' }}>
-                                ${trip.price}
-                            </p>
-                            <div className="flex gap-2 mt-auto">
-                                <button
-                                    onClick={() => handleEdit(trip)}
-                                    className="flex items-center gap-1 px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors text-sm flex-1"
-                                    title="Edit"
-                                >
-                                    <Edit className="w-4 h-4" />
-                                    <span>Edit</span>
-                                </button>
-                                <button
-                                    onClick={() => handleDelete(trip.id)}
-                                    className="flex items-center gap-1 px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
-                                    title="Delete"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
+                                {!trip.is_active && (
+                                    <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs">
+                                        Inactive
+                                    </div>
+                                )}
+                            </div>
+                            <div className="p-4 flex-1 flex flex-col">
+                                <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-2 line-clamp-2">
+                                    {trip.title}
+                                </h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{trip.destination}</p>
+                                <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">
+                                    {new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-500 mb-1">
+                                    {trip.duration}
+                                </p>
+                                <p className="text-xs text-gray-500 dark:text-gray-500 mb-2">
+                                    Slots: {trip.available_slots}
+                                </p>
+                                <p className="text-lg font-semibold mb-4" style={{ color: 'rgb(216, 167, 40)' }}>
+                                    ${trip.price}
+                                </p>
+                                <div className="flex gap-2 mt-auto">
+                                    <button
+                                        onClick={() => handleEdit(trip)}
+                                        className="flex items-center gap-1 px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors text-sm flex-1"
+                                        title="Edit"
+                                    >
+                                        <Edit className="w-4 h-4" />
+                                        <span>Edit</span>
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(trip.id)}
+                                        className="flex items-center gap-1 px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
+                                        title="Delete"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );
@@ -163,9 +181,15 @@ function TripForm({ trip, onClose, onSave }: {
         image_url: '',
         description: '',
         available_slots: 0,
-        is_active: true
+        is_active: true,
+        category: 'upcoming' // 'upcoming' or 'past'
     });
     const [uploading, setUploading] = useState(false);
+
+    // Check if trip is past or upcoming
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const isPast = formData.end_date ? new Date(formData.end_date) < today : false;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -245,6 +269,38 @@ function TripForm({ trip, onClose, onSave }: {
                                 />
                             </div>
                         </div>
+
+                        {/* Category Selector */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Trip Category
+                            </label>
+                            <select
+                                value={formData.category || 'upcoming'}
+                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 transition-all"
+                            >
+                                <option value="upcoming">Upcoming Trip</option>
+                                <option value="past">Past Trip</option>
+                            </select>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                {formData.category === 'past'
+                                    ? 'Will show in "Past Trips" section with grayscale effect'
+                                    : 'Will show in "Upcoming Trips" section with full color'
+                                }
+                            </p>
+                        </div>
+
+                        {/* Auto-detected Category Indicator */}
+                        {formData.end_date && (
+                            <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800">
+                                <p className="text-sm text-blue-700 dark:text-blue-300">
+                                    <strong>Auto-detected:</strong> Based on end date, this trip is {isPast ? 'Past' : 'Upcoming'}.
+                                    You can override this with the category selector above.
+                                </p>
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -366,8 +422,8 @@ function TripForm({ trip, onClose, onSave }: {
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
+                </div >
+            </div >
+        </div >
     );
 }

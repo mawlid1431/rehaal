@@ -32,6 +32,11 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({ tripId, onNaviga
     }
   };
 
+  // Check if trip is past
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const isPast = trip ? new Date(trip.end_date) < today : false;
+
   if (loading) {
     return (
       <div className="pt-20 min-h-screen flex items-center justify-center">
@@ -214,23 +219,39 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({ tripId, onNaviga
                     </div>
                   </div>
 
-                  <Button
-                    className="w-full mb-3"
-                    style={{ backgroundColor: 'rgb(216, 167, 40)' }}
-                    onClick={() => {
-                      onNavigate('booking', tripId);
-                    }}
-                  >
-                    Book This Trip
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    className="w-full border-[rgb(216,167,40)] text-[rgb(216,167,40)]"
-                    onClick={() => onNavigate('contact')}
-                  >
-                    Request More Info
-                  </Button>
+                  {isPast ? (
+                    <>
+                      <div className="w-full mb-3 px-4 py-3 bg-gray-500 text-white text-center rounded-lg font-semibold">
+                        Trip Ended
+                      </div>
+                      <Button
+                        variant="outline"
+                        className="w-full border-[rgb(216,167,40)] text-[rgb(216,167,40)]"
+                        onClick={() => onNavigate('contact')}
+                      >
+                        Contact for Future Trips
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        className="w-full mb-3"
+                        style={{ backgroundColor: 'rgb(216, 167, 40)' }}
+                        onClick={() => {
+                          onNavigate('booking', tripId);
+                        }}
+                      >
+                        Book Now
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full border-[rgb(216,167,40)] text-[rgb(216,167,40)]"
+                        onClick={() => onNavigate('contact')}
+                      >
+                        Request More Info
+                      </Button>
+                    </>
+                  )}
                 </div>
               </motion.div>
             </div>

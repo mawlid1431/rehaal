@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS trips (
   description TEXT,
   available_slots INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT true,
+  category TEXT DEFAULT 'upcoming' CHECK (category IN ('upcoming', 'past')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -87,6 +88,7 @@ CREATE TABLE IF NOT EXISTS services (
 -- ============================================
 CREATE INDEX IF NOT EXISTS idx_trips_title ON trips(title);
 CREATE INDEX IF NOT EXISTS idx_trips_active ON trips(is_active);
+CREATE INDEX IF NOT EXISTS idx_trips_category ON trips(category);
 CREATE INDEX IF NOT EXISTS idx_bookings_trip_id ON bookings(trip_id);
 CREATE INDEX IF NOT EXISTS idx_bookings_status ON bookings(status);
 CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date);

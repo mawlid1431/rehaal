@@ -16,9 +16,10 @@ interface TripCardProps {
     image_url: string;
   };
   onViewDetails: (id: string) => void;
+  isPast?: boolean;
 }
 
-export const TripCard: React.FC<TripCardProps> = ({ trip, onViewDetails }) => {
+export const TripCard: React.FC<TripCardProps> = ({ trip, onViewDetails, isPast = false }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 60, scale: 0.8, rotateX: -15 }}
@@ -48,12 +49,17 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onViewDetails }) => {
           <ImageWithFallback
             src={trip.image_url}
             alt={trip.title}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover ${isPast ? 'grayscale opacity-70' : ''}`}
           />
         </motion.div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+        {isPast && (
+          <div className="absolute top-4 left-4 bg-gray-600 text-white px-4 py-2 rounded-full font-semibold shadow-lg">
+            Ended
+          </div>
+        )}
         <motion.div
-          className="absolute top-4 right-4 bg-gradient-to-r from-[rgb(216,167,40)] to-[rgb(186,137,10)] text-white px-5 py-2 rounded-full font-semibold shadow-lg"
+          className={`absolute top-4 right-4 ${isPast ? 'bg-gray-500' : 'bg-gradient-to-r from-[rgb(216,167,40)] to-[rgb(186,137,10)]'} text-white px-5 py-2 rounded-full font-semibold shadow-lg`}
           whileHover={{ scale: 1.1, rotate: 5 }}
           transition={{ duration: 0.3 }}
         >
@@ -90,7 +96,7 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onViewDetails }) => {
         >
           <Button
             className="w-full font-semibold shadow-lg hover:shadow-xl"
-            style={{ backgroundColor: 'rgb(216, 167, 40)' }}
+            style={{ backgroundColor: isPast ? 'rgb(107, 114, 128)' : 'rgb(216, 167, 40)' }}
             onClick={(e) => {
               e.stopPropagation();
               onViewDetails(trip.id);

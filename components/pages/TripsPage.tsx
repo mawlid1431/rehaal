@@ -11,6 +11,7 @@ interface TripsPageProps {
 export const TripsPage: React.FC<TripsPageProps> = ({ onNavigate }) => {
   const [trips, setTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'upcoming' | 'past'>('all');
 
   useEffect(() => {
     fetchTrips();
@@ -26,6 +27,35 @@ export const TripsPage: React.FC<TripsPageProps> = ({ onNavigate }) => {
       setLoading(false);
     }
   };
+
+  // Categorize trips as upcoming or past
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const upcomingTrips = trips.filter(trip => {
+    // Use manual category if set, otherwise auto-detect
+    if (trip.category) {
+      return trip.category === 'upcoming';
+    }
+    return new Date(trip.end_date) >= today;
+  });
+
+  const pastTrips = trips.filter(trip => {
+    // Use manual category if set, otherwise auto-detect
+    if (trip.category) {
+      return trip.category === 'past';
+    }
+    return new Date(trip.end_date) < today;
+  });
+
+  // Filter trips based on active filter
+  const getFilteredTrips = () => {
+    if (activeFilter === 'upcoming') return upcomingTrips;
+    if (activeFilter === 'past') return pastTrips;
+    return trips; // 'all'
+  };
+
+  const filteredTrips = getFilteredTrips();
   return (
     <div className="pt-20">
       {/* Hero Section */}
@@ -51,28 +81,76 @@ export const TripsPage: React.FC<TripsPageProps> = ({ onNavigate }) => {
       {/* Trips Grid */}
       <section className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {loading ? (
-              <div className="col-span-3 text-center py-12">Loading trips...</div>
-            ) : trips.length === 0 ? (
-              <div className="col-span-3 text-center py-12">No trips available at the moment.</div>
-            ) : (
-              trips.map((trip, index) => (
-                <motion.div
-                  key={trip.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                >
-                  <TripCard
-                    trip={trip}
-                    onViewDetails={(id) => onNavigate('trip-detail', id)}
-                  />
-                </motion.div>
-              ))
-            )}
-          </div>
+          {/* Filter Tabs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex justify-center gap-3 mb-12 flex-wrap"
+          >
+            <motion.button
+              onClick={() => setActiveFilter('all')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 ${activeFilter === 'all'
+                ? 'bg-gradient-to-r from-[rgb(216,167,40)] to-[rgb(186,137,10)] text-white shadow-xl'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-[rgb(216,167,40)] hover:shadow-lg'
+                }`}
+            >
+              All Trips <span className="ml-2 opacity-75">({trips.length})</span>
+            </motion.button>
+            <motion.button
+              onClick={() => setActiveFilter('upcoming')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 ${activeFilter === 'upcoming'
+                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-xl'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-green-500 hover:shadow-lg'
+                }`}
+            >
+              Upcoming <span className="ml-2 opacity-75">({upcomingTrips.length})</span>
+            </motion.button>
+            <motion.button
+              onClick={() => setActiveFilter('past')}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={`px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 ${activeFilter === 'past'
+                ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-xl'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-gray-500 hover:shadow-lg'
+                }`}
+            >
+              Past <span className="ml-2 opacity-75">({pastTrips.length})</span>
+            </motion.button>
+          </motion.div>
+
+          {loading ? (
+            <div className="text-center py-12">Loading trips...</div>
+          ) : filteredTrips.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-xl text-gray-600 dark:text-gray-400">
+                No {activeFilter === 'all' ? '' : activeFilter} trips available at the moment.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredTrips.map((trip, index) => {
+                const isPast = trip.category ? trip.category === 'past' : new Date(trip.end_date) < today;
+                return (
+                  <motion.div
+                    key={trip.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                  >
+                    <TripCard
+                      trip={trip}
+                      onViewDetails={(id) => onNavigate('trip-detail', id)}
+                      isPast={isPast}
+                    />
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
