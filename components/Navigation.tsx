@@ -55,12 +55,14 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate 
           {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="cursor-pointer"
+            className="cursor-pointer flex items-center"
             onClick={() => onNavigate('home')}
           >
-            <h1 className="text-2xl font-bold tracking-wide" style={{ color: 'rgb(216, 167, 40)' }}>
-              Rehaal Travel
-            </h1>
+            <img
+              src={isDarkMode ? '/Public/Assents/Logos/Darkmode-on.png' : '/Public/Assents/Logos/Lighmode_on.png'}
+              alt="Rehaal Travel Logo"
+              className="h-12 w-auto object-contain"
+            />
           </motion.div>
 
           {/* Desktop Navigation */}
