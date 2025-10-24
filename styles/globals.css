@@ -3,7 +3,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --font-size: 16px;
+  --font-size: 14px;
   --background: #ffffff;
   --foreground: oklch(0.145 0 0);
   --card: #ffffff;
@@ -198,6 +198,32 @@
 
 html {
   font-size: var(--font-size);
+  zoom: 0.9;
+}
+
+body {
+  font-size: 0.95rem;
+}
+
+/* Make everything slightly more compact */
+h1 {
+  font-size: 1.8rem !important;
+}
+
+h2 {
+  font-size: 1.5rem !important;
+}
+
+h3 {
+  font-size: 1.25rem !important;
+}
+
+h4 {
+  font-size: 1.1rem !important;
+}
+
+p {
+  font-size: 0.95rem !important;
 }
 
 /* Smooth scrolling animations */

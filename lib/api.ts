@@ -226,6 +226,131 @@ export const bookingsApi = {
     }
 }
 
+// ADMIN USERS API
+export const adminUsersApi = {
+    getAll: async () => {
+        const { data, error } = await supabase
+            .from('admin_users')
+            .select('id, username, email, full_name, role, is_active, last_login, created_at')
+            .order('created_at', { ascending: false })
+        if (error) throw error
+        return data
+    },
+
+    getById: async (id: string) => {
+        const { data, error } = await supabase
+            .from('admin_users')
+            .select('id, username, email, full_name, role, is_active, last_login, created_at')
+            .eq('id', id)
+            .single()
+        if (error) throw error
+        return data
+    },
+
+    getByEmail: async (email: string) => {
+        const { data, error } = await supabase
+            .from('admin_users')
+            .select('*')
+            .eq('email', email)
+            .single()
+        if (error) throw error
+        return data
+    },
+
+    getByUsername: async (username: string) => {
+        const { data, error } = await supabase
+            .from('admin_users')
+            .select('*')
+            .eq('username', username)
+            .single()
+        if (error) throw error
+        return data
+    },
+
+    create: async (user: any) => {
+        const { data, error } = await supabase
+            .from('admin_users')
+            .insert(user)
+            .select('id, username, email, full_name, role, is_active, created_at')
+            .single()
+        if (error) throw error
+        return data
+    },
+
+    update: async (id: string, user: any) => {
+        const { data, error } = await supabase
+            .from('admin_users')
+            .update(user)
+            .eq('id', id)
+            .select('id, username, email, full_name, role, is_active, created_at')
+            .single()
+        if (error) throw error
+        return data
+    },
+
+    updateLastLogin: async (id: string) => {
+        const { error } = await supabase
+            .from('admin_users')
+            .update({ last_login: new Date().toISOString() })
+            .eq('id', id)
+        if (error) throw error
+    },
+
+    delete: async (id: string) => {
+        const { error } = await supabase
+            .from('admin_users')
+            .delete()
+            .eq('id', id)
+        if (error) throw error
+    }
+}
+
+// PASSWORD RESET API
+export const passwordResetApi = {
+    createToken: async (userId: string, token: string) => {
+        const expiresAt = new Date()
+        expiresAt.setHours(expiresAt.getHours() + 1) // 1 hour expiry
+
+        const { data, error } = await supabase
+            .from('password_reset_tokens')
+            .insert({
+                user_id: userId,
+                token,
+                expires_at: expiresAt.toISOString()
+            })
+            .select()
+            .single()
+        if (error) throw error
+        return data
+    },
+
+    verifyToken: async (token: string) => {
+        const { data, error } = await supabase
+            .from('password_reset_tokens')
+            .select('*, admin_users(email)')
+            .eq('token', token)
+            .eq('used', false)
+            .single()
+
+        if (error) throw error
+
+        // Check if expired
+        if (new Date(data.expires_at) < new Date()) {
+            throw new Error('Token expired')
+        }
+
+        return data
+    },
+
+    markTokenUsed: async (token: string) => {
+        const { error } = await supabase
+            .from('password_reset_tokens')
+            .update({ used: true })
+            .eq('token', token)
+        if (error) throw error
+    }
+}
+
 // IMAGE UPLOAD HELPER
 export const uploadImage = async (file: File, bucket: string = 'images') => {
     const fileExt = file.name.split('.').pop()
