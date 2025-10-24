@@ -134,7 +134,7 @@ export const TripsPage: React.FC<TripsPageProps> = ({ onNavigate }) => {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredTrips.map((trip, index) => {
                 const isPast = trip.category ? trip.category === 'past' : new Date(trip.end_date) < today;
                 return (

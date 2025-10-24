@@ -30,20 +30,20 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onViewDetails, isPast 
         ease: [0.25, 0.46, 0.45, 0.94]
       }}
       whileHover={{
-        y: -15,
-        scale: 1.03,
-        boxShadow: "0 25px 50px rgba(216, 167, 40, 0.3)",
-        transition: { duration: 0.5, ease: "easeOut" }
+        y: -8,
+        scale: 1.02,
+        boxShadow: "0 20px 40px rgba(216, 167, 40, 0.25)",
+        transition: { duration: 0.4, ease: "easeOut" }
       }}
-      className="relative bg-gradient-to-br from-card via-card to-card/80 rounded-2xl overflow-hidden shadow-xl border-2 border-[rgb(216,167,40)]/20 hover:border-[rgb(216,167,40)]/60 transition-all cursor-pointer group"
+      className="relative bg-gradient-to-br from-card via-card to-card/80 rounded-xl overflow-hidden shadow-lg border-2 border-[rgb(216,167,40)]/20 hover:border-[rgb(216,167,40)]/60 transition-all cursor-pointer group"
       onClick={() => onViewDetails(trip.id)}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-[rgb(216,167,40)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none" />
 
-      <div className="relative h-56 overflow-hidden">
+      <div className="relative h-36 sm:h-40 overflow-hidden">
         <motion.div
-          whileHover={{ scale: 1.15 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          whileHover={{ scale: 1.1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full h-full"
         >
           <ImageWithFallback
@@ -54,48 +54,50 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onViewDetails, isPast 
         </motion.div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         {isPast && (
-          <div className="absolute top-4 left-4 bg-gray-600 text-white px-4 py-2 rounded-full font-semibold shadow-lg">
+          <div className="absolute top-2 left-2 bg-gray-600 text-white px-2 py-1 rounded-full text-[10px] font-semibold shadow-lg">
             Ended
           </div>
         )}
         <motion.div
-          className={`absolute top-4 right-4 ${isPast ? 'bg-gray-500' : 'bg-gradient-to-r from-[rgb(216,167,40)] to-[rgb(186,137,10)]'} text-white px-5 py-2 rounded-full font-semibold shadow-lg`}
-          whileHover={{ scale: 1.1, rotate: 5 }}
+          className={`absolute top-2 right-2 ${isPast ? 'bg-gray-500' : 'bg-gradient-to-r from-[rgb(216,167,40)] to-[rgb(186,137,10)]'} text-white px-2.5 py-1 rounded-full text-xs font-semibold shadow-lg`}
+          whileHover={{ scale: 1.08, rotate: 3 }}
           transition={{ duration: 0.3 }}
         >
           ${trip.price}
         </motion.div>
       </div>
 
-      <div className="p-6 relative z-20">
-        <h3 className="mb-4 text-xl font-semibold">{trip.title}</h3>
+      <div className="p-3 sm:p-4 relative z-20">
+        <h3 className="mb-2 text-sm sm:text-base font-semibold line-clamp-1">{trip.title}</h3>
 
-        <div className="space-y-3 mb-6">
+        <div className="space-y-1.5 mb-3">
           <motion.div
             className="flex items-center text-muted-foreground"
-            whileHover={{ x: 5 }}
+            whileHover={{ x: 3 }}
             transition={{ duration: 0.3 }}
           >
-            <MapPin className="w-5 h-5 mr-3 text-[rgb(216,167,40)]" />
-            <span className="text-sm">{trip.destination}</span>
+            <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[rgb(216,167,40)] flex-shrink-0" />
+            <span className="text-xs line-clamp-1">{trip.destination}</span>
           </motion.div>
           <motion.div
             className="flex items-center text-muted-foreground"
-            whileHover={{ x: 5 }}
+            whileHover={{ x: 3 }}
             transition={{ duration: 0.3 }}
           >
-            <Calendar className="w-5 h-5 mr-3 text-[rgb(216,167,40)]" />
-            <span className="text-sm">{new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}</span>
+            <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2 text-[rgb(216,167,40)] flex-shrink-0" />
+            <span className="text-xs line-clamp-1">
+              {new Date(trip.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(trip.end_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </span>
           </motion.div>
         </div>
 
         <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
           transition={{ duration: 0.2 }}
         >
           <Button
-            className="w-full font-semibold shadow-lg hover:shadow-xl"
+            className="w-full font-semibold shadow-md hover:shadow-lg text-xs sm:text-sm py-2"
             style={{ backgroundColor: isPast ? 'rgb(107, 114, 128)' : 'rgb(216, 167, 40)' }}
             onClick={(e) => {
               e.stopPropagation();
@@ -107,7 +109,7 @@ export const TripCard: React.FC<TripCardProps> = ({ trip, onViewDetails, isPast 
         </motion.div>
       </div>
 
-      <div className="absolute top-0 right-0 w-20 h-20 bg-[rgb(216,167,40)]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
+      <div className="absolute top-0 right-0 w-16 h-16 bg-[rgb(216,167,40)]/10 rounded-full blur-xl group-hover:scale-125 transition-transform duration-500" />
     </motion.div>
   );
 };

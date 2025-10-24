@@ -94,48 +94,48 @@ export function TestimonialsManager() {
                 />
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {testimonials.map((testimonial) => (
                     <div
                         key={testimonial.id}
-                        className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-5 flex flex-col"
+                        className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-3 flex flex-col hover:shadow-lg transition-shadow"
                     >
-                        <div className="flex justify-between items-start mb-3">
-                            <div className="flex-1">
-                                <h3 className="font-semibold text-gray-800 dark:text-white">
+                        <div className="flex justify-between items-start mb-2">
+                            <div className="flex-1 min-w-0">
+                                <h3 className="text-sm font-semibold text-gray-800 dark:text-white line-clamp-1">
                                     {testimonial.customer_name}
                                 </h3>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                    {new Date(testimonial.date).toLocaleDateString()}
+                                <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+                                    {new Date(testimonial.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </p>
                             </div>
-                            <div className="flex gap-0.5">
+                            <div className="flex gap-0.5 flex-shrink-0 ml-2">
                                 {[...Array(testimonial.rating)].map((_, i) => (
-                                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                    <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                                 ))}
                             </div>
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 line-clamp-1">
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-2 line-clamp-1">
                             {testimonial.trips?.title || 'N/A'}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 flex-1 line-clamp-3">
+                        <p className="text-xs text-gray-600 dark:text-gray-300 mb-3 flex-1 line-clamp-2">
                             {testimonial.comment}
                         </p>
-                        <div className="flex gap-2 mt-auto">
+                        <div className="flex gap-1.5 mt-auto">
                             <button
                                 onClick={() => handleEdit(testimonial)}
-                                className="flex items-center gap-1 px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors text-sm flex-1"
+                                className="flex items-center justify-center gap-1 px-2 py-1.5 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors text-xs flex-1"
                                 title="Edit"
                             >
-                                <Edit className="w-4 h-4" />
-                                <span>Edit</span>
+                                <Edit className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Edit</span>
                             </button>
                             <button
                                 onClick={() => handleDelete(testimonial.id)}
-                                className="flex items-center gap-1 px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
+                                className="flex items-center justify-center px-2 py-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-xs"
                                 title="Delete"
                             >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5" />
                             </button>
                         </div>
                     </div>

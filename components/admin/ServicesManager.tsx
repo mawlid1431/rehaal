@@ -88,33 +88,32 @@ export function ServicesManager() {
                 />
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {services.map((service) => (
                     <div
                         key={service.id}
-                        className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6"
+                        className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 hover:shadow-lg transition-shadow"
                     >
-                        <div className="text-4xl mb-3">{service.icon}</div>
-                        <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
+                        <div className="text-3xl mb-2">{service.icon}</div>
+                        <h3 className="text-base font-semibold text-gray-800 dark:text-white mb-1 line-clamp-1">
                             {service.name}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-300 mb-4">
+                        <p className="text-xs text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
                             {service.description}
                         </p>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1.5">
                             <button
                                 onClick={() => handleEdit(service)}
-                                className="flex items-center gap-1 px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors text-sm"
+                                className="flex items-center justify-center gap-1 px-2 py-1.5 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors text-xs flex-1"
                             >
-                                <Edit className="w-4 h-4" />
-                                Edit
+                                <Edit className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Edit</span>
                             </button>
                             <button
                                 onClick={() => handleDelete(service.id)}
-                                className="flex items-center gap-1 px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
+                                className="flex items-center justify-center px-2 py-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-xs"
                             >
-                                <Trash2 className="w-4 h-4" />
-                                Delete
+                                <Trash2 className="w-3.5 h-3.5" />
                             </button>
                         </div>
                     </div>

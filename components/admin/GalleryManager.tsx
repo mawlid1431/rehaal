@@ -88,38 +88,38 @@ export function GalleryManager() {
                 />
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {gallery.map((image) => (
                     <div
                         key={image.id}
-                        className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden group"
+                        className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden group hover:shadow-lg transition-shadow"
                     >
                         <div className="relative">
                             <img
                                 src={image.image_url}
                                 alt={image.title}
-                                className="w-full h-48 object-cover"
+                                className="w-full h-32 sm:h-36 object-cover"
                             />
                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                                 <button
                                     onClick={() => handleEdit(image)}
-                                    className="p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+                                    className="p-1.5 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                                 >
-                                    <Edit className="w-5 h-5" />
+                                    <Edit className="w-4 h-4" />
                                 </button>
                                 <button
                                     onClick={() => handleDelete(image.id)}
-                                    className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                    className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600"
                                 >
-                                    <Trash2 className="w-5 h-5" />
+                                    <Trash2 className="w-4 h-4" />
                                 </button>
                             </div>
                         </div>
-                        <div className="p-4">
-                            <h3 className="font-semibold text-gray-800 dark:text-white mb-1">
+                        <div className="p-3">
+                            <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-1 line-clamp-1">
                                 {image.title}
                             </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
                                 {image.description}
                             </p>
                         </div>
