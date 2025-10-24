@@ -118,10 +118,19 @@ function TripForm({ trip, onClose, onSave }: {
         description: '',
         includes: []
     });
+    const [destinations, setDestinations] = useState<string[]>([formData.destination || '']);
+    const [durations, setDurations] = useState<string[]>([formData.duration || '']);
+    const [prices, setPrices] = useState<string[]>([formData.price || '']);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ ...formData, id: 'id' in formData ? formData.id : 0 });
+        const updatedData = {
+            ...formData,
+            destination: destinations.filter(d => d).join(', '),
+            duration: durations[0] || '',
+            price: prices[0] || ''
+        };
+        onSave({ ...updatedData, id: 'id' in formData ? formData.id : 0 });
     };
 
     return (
@@ -144,55 +153,132 @@ function TripForm({ trip, onClose, onSave }: {
                                 required
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Destination
-                            </label>
-                            <input
-                                type="text"
-                                value={formData.destination}
-                                onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                                required
-                            />
-                        </div>
                         <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Destination
+                                </label>
+                                {destinations.map((dest, index) => (
+                                    <div key={index} className="flex gap-2 mb-2">
+                                        <input
+                                            type="text"
+                                            value={dest}
+                                            onChange={(e) => {
+                                                const newDests = [...destinations];
+                                                newDests[index] = e.target.value;
+                                                setDestinations(newDests);
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                                            placeholder="Paris, France"
+                                            required
+                                        />
+                                        {destinations.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setDestinations(destinations.filter((_, i) => i !== index))}
+                                                className="px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setDestinations([...destinations, ''])}
+                                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                                >
+                                    + Add
+                                </button>
+                            </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Dates
                                 </label>
                                 <input
-                                    type="text"
+                                    type="date"
                                     value={formData.dates}
                                     onChange={(e) => setFormData({ ...formData, dates: e.target.value })}
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
                                     required
                                 />
                             </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                     Duration
                                 </label>
-                                <input
-                                    type="text"
-                                    value={formData.duration}
-                                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                                    required
-                                />
+                                {durations.map((dur, index) => (
+                                    <div key={index} className="flex gap-2 mb-2">
+                                        <input
+                                            type="text"
+                                            value={dur}
+                                            onChange={(e) => {
+                                                const newDurs = [...durations];
+                                                newDurs[index] = e.target.value;
+                                                setDurations(newDurs);
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                                            placeholder="7 days"
+                                            required
+                                        />
+                                        {durations.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setDurations(durations.filter((_, i) => i !== index))}
+                                                className="px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setDurations([...durations, ''])}
+                                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                                >
+                                    + Add
+                                </button>
                             </div>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Price
-                            </label>
-                            <input
-                                type="text"
-                                value={formData.price}
-                                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
-                                required
-                            />
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    Price
+                                </label>
+                                {prices.map((price, index) => (
+                                    <div key={index} className="flex gap-2 mb-2">
+                                        <input
+                                            type="text"
+                                            value={price}
+                                            onChange={(e) => {
+                                                const newPrices = [...prices];
+                                                newPrices[index] = e.target.value;
+                                                setPrices(newPrices);
+                                            }}
+                                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-white"
+                                            placeholder="$1299"
+                                            required
+                                        />
+                                        {prices.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setPrices(prices.filter((_, i) => i !== index))}
+                                                className="px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setPrices([...prices, ''])}
+                                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                                >
+                                    + Add
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

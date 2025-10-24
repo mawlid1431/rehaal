@@ -1,67 +1,72 @@
-import { useState } from 'react';
-import { Eye, Trash2, Download, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Eye, Check, X, Trash2, Download, Search } from 'lucide-react';
+import { bookingsApi } from '../../lib/api';
+import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 
-interface Booking {
-    id: number;
-    tripTitle: string;
-    fullName: string;
-    email: string;
-    phone: string;
-    travelers: number;
-    date: string;
-    status: 'pending' | 'confirmed' | 'cancelled';
-}
-
 export function BookingsManager() {
-    const [bookings, setBookings] = useState<Booking[]>([
-        {
-            id: 1,
-            tripTitle: 'Umrah Package - December 2025',
-            fullName: 'Ahmed Hassan',
-            email: 'ahmed@example.com',
-            phone: '+45 12345678',
-            travelers: 2,
-            date: '2024-10-20',
-            status: 'confirmed'
-        },
-        {
-            id: 2,
-            tripTitle: 'Umrah Package - January/February 2026',
-            fullName: 'Fatima Nielsen',
-            email: 'fatima@example.com',
-            phone: '+45 87654321',
-            travelers: 1,
-            date: '2024-10-21',
-            status: 'pending'
-        }
-    ]);
-
+    const [bookings, setBookings] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+    const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchBookings();
+    }, []);
+
+    const fetchBookings = async () => {
+        try {
+            const data = await bookingsApi.getAll();
+            setBookings(data);
+        } catch (error) {
+            toast.error('Failed to fetch bookings');
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleStatusUpdate = async (id: string, status: 'confirmed' | 'cancelled') => {
+        try {
+            await bookingsApi.updateStatus(id, status);
+            toast.success(`Booking ${status}`);
+            fetchBookings();
+        } catch (error) {
+            toast.error('Failed to update status');
+            console.error(error);
+        }
+    };
 
     const filteredBookings = bookings.filter(booking =>
-        booking.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        booking.tripTitle.toLowerCase().includes(searchTerm.toLowerCase())
+        booking.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.customer_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.trips?.title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this booking?')) {
-            setBookings(bookings.filter(booking => booking.id !== id));
+    const handleDelete = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this booking?')) return;
+
+        try {
+            await bookingsApi.delete(id);
+            toast.success('Booking deleted');
+            fetchBookings();
+        } catch (error) {
+            toast.error('Failed to delete booking');
+            console.error(error);
         }
     };
 
     const handleExportToExcel = () => {
         const worksheet = XLSX.utils.json_to_sheet(bookings.map(b => ({
             'Booking ID': b.id,
-            'Trip': b.tripTitle,
-            'Full Name': b.fullName,
-            'Email': b.email,
-            'Phone': b.phone,
-            'Travelers': b.travelers,
-            'Date': b.date,
-            'Status': b.status
+            'Trip': b.trips?.title || 'N/A',
+            'Customer Name': b.customer_name,
+            'Email': b.customer_email,
+            'Phone': b.customer_phone,
+            'Travelers': b.number_of_people,
+            'Date': b.booking_date,
+            'Status': b.status,
+            'Total Price': b.total_price
         })));
 
         const workbook = XLSX.utils.book_new();
@@ -77,6 +82,10 @@ export function BookingsManager() {
             default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
         }
     };
+
+    if (loading) {
+        return <div className="text-sm text-gray-600 dark:text-gray-400">Loading bookings...</div>;
+    }
 
     return (
         <div>
@@ -106,75 +115,96 @@ export function BookingsManager() {
 
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50 dark:bg-gray-700">
+                    <table className="w-full text-sm">
+                        <thead className="bg-slate-700 text-white">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                     ID
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                     Trip
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                     Customer
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                     Contact
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                     Travelers
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                     Date
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                     Status
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                     Actions
                                 </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                            {filteredBookings.map((booking) => (
+                            {filteredBookings.map((booking, index) => (
                                 <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white">
-                                        #{booking.id}
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-800 dark:text-white">
+                                        #{index + 1}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-800 dark:text-white">
-                                        {booking.tripTitle}
+                                    <td className="px-4 py-3 text-sm text-gray-800 dark:text-white">
+                                        <div className="font-medium">{booking.trips?.title || 'N/A'}</div>
+                                        <div className="text-xs text-gray-500">{booking.trips?.destination}</div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white">
-                                        {booking.fullName}
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-800 dark:text-white">
+                                        {booking.customer_name}
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                                        <div>{booking.email}</div>
-                                        <div>{booking.phone}</div>
+                                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                                        <div className="text-xs">{booking.customer_email}</div>
+                                        <div className="text-xs">{booking.customer_phone}</div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-white">
-                                        {booking.travelers}
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-800 dark:text-white">
+                                        {booking.number_of_people}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                                        {booking.date}
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                                        {new Date(booking.booking_date).toLocaleDateString()}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-4 py-3 whitespace-nowrap">
                                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(booking.status)}`}>
                                             {booking.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                        <div className="flex gap-2">
+                                    <td className="px-4 py-3 whitespace-nowrap text-sm">
+                                        <div className="flex gap-1">
                                             <button
                                                 onClick={() => setSelectedBooking(booking)}
-                                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                                className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                                title="View"
                                             >
-                                                <Eye className="w-5 h-5" />
+                                                <Eye className="w-4 h-4" />
                                             </button>
+                                            {booking.status === 'pending' && (
+                                                <button
+                                                    onClick={() => handleStatusUpdate(booking.id, 'confirmed')}
+                                                    className="p-1 text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300"
+                                                    title="Accept"
+                                                >
+                                                    <Check className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                            {booking.status !== 'cancelled' && (
+                                                <button
+                                                    onClick={() => handleStatusUpdate(booking.id, 'cancelled')}
+                                                    className="p-1 text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300"
+                                                    title="Cancel"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                            )}
                                             <button
                                                 onClick={() => handleDelete(booking.id)}
-                                                className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                                                className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                                                title="Delete"
                                             >
-                                                <Trash2 className="w-5 h-5" />
+                                                <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
                                     </td>
@@ -184,6 +214,12 @@ export function BookingsManager() {
                     </table>
                 </div>
             </div>
+
+            {filteredBookings.length === 0 && (
+                <div className="text-center py-8 text-sm text-gray-500 dark:text-gray-400">
+                    No bookings found
+                </div>
+            )}
 
             {selectedBooking && (
                 <BookingDetailModal
@@ -195,7 +231,7 @@ export function BookingsManager() {
     );
 }
 
-function BookingDetailModal({ booking, onClose }: { booking: Booking; onClose: () => void }) {
+function BookingDetailModal({ booking, onClose }: { booking: any; onClose: () => void }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full">
@@ -206,36 +242,49 @@ function BookingDetailModal({ booking, onClose }: { booking: Booking; onClose: (
                     <div className="space-y-3">
                         <div>
                             <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Booking ID</label>
-                            <p className="text-gray-800 dark:text-white">#{booking.id}</p>
+                            <p className="text-gray-800 dark:text-white font-mono text-xs">{booking.id}</p>
                         </div>
                         <div>
                             <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Trip</label>
-                            <p className="text-gray-800 dark:text-white">{booking.tripTitle}</p>
+                            <p className="text-gray-800 dark:text-white">{booking.trips?.title}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{booking.trips?.destination}</p>
                         </div>
                         <div>
-                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Full Name</label>
-                            <p className="text-gray-800 dark:text-white">{booking.fullName}</p>
+                            <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Customer Name</label>
+                            <p className="text-gray-800 dark:text-white">{booking.customer_name}</p>
                         </div>
                         <div>
                             <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
-                            <p className="text-gray-800 dark:text-white">{booking.email}</p>
+                            <p className="text-gray-800 dark:text-white">{booking.customer_email}</p>
                         </div>
                         <div>
                             <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</label>
-                            <p className="text-gray-800 dark:text-white">{booking.phone}</p>
+                            <p className="text-gray-800 dark:text-white">{booking.customer_phone}</p>
                         </div>
                         <div>
                             <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Number of Travelers</label>
-                            <p className="text-gray-800 dark:text-white">{booking.travelers}</p>
+                            <p className="text-gray-800 dark:text-white">{booking.number_of_people}</p>
                         </div>
                         <div>
                             <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Booking Date</label>
-                            <p className="text-gray-800 dark:text-white">{booking.date}</p>
+                            <p className="text-gray-800 dark:text-white">{new Date(booking.booking_date).toLocaleDateString()}</p>
                         </div>
+                        {booking.total_price && (
+                            <div>
+                                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Total Price</label>
+                                <p className="text-gray-800 dark:text-white font-bold">${booking.total_price}</p>
+                            </div>
+                        )}
                         <div>
                             <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</label>
                             <p className="text-gray-800 dark:text-white capitalize">{booking.status}</p>
                         </div>
+                        {booking.special_requests && (
+                            <div>
+                                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Special Requests</label>
+                                <p className="text-gray-800 dark:text-white text-sm">{booking.special_requests}</p>
+                            </div>
+                        )}
                     </div>
                     <div className="mt-6 flex justify-end">
                         <button
