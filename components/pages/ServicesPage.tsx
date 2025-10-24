@@ -1,75 +1,94 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plane, Hotel, FileCheck, Bus, MapPin, BookOpen, GraduationCap, HeadphonesIcon, CreditCard, Users, Shield, Clock } from 'lucide-react';
 import { Button } from '../ui/button';
+import { servicesApi } from '../../lib/api';
 
 interface ServicesPageProps {
     onNavigate: (page: string) => void;
 }
 
 export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
-    const services = [
-        {
-            icon: <Plane className="w-8 h-8" />,
-            title: 'Flight Booking',
-            description: 'Complete flight arrangements from Denmark to Saudi Arabia with trusted airlines. We handle all booking details to ensure comfortable and convenient travel for your sacred journey.'
-        },
-        {
-            icon: <Hotel className="w-8 h-8" />,
-            title: '4-5 Star Hotels',
-            description: 'Luxury accommodation close to Haram in Makkah and Madinah. Stay in premium hotels within walking distance of the holy sites, allowing you to focus on worship without logistical concerns.'
-        },
-        {
-            icon: <FileCheck className="w-8 h-8" />,
-            title: 'Visa Issuance',
-            description: 'Seamless visa processing and arrangements. We handle all visa formalities and documentation, making the process hassle-free so you can prepare spiritually for your journey.'
-        },
-        {
-            icon: <Bus className="w-8 h-8" />,
-            title: 'Ground Transport',
-            description: 'Comfortable local transportation throughout your journey. Air-conditioned buses and vehicles for all transfers between airports, hotels, and holy sites.'
-        },
-        {
-            icon: <MapPin className="w-8 h-8" />,
-            title: 'Seerah Tours',
-            description: 'Guided visits to historical and religious sites in Makkah and Madinah. Learn about Islamic history while visiting significant locations from the life of Prophet Muhammad (PBUH).'
-        },
-        {
-            icon: <BookOpen className="w-8 h-8" />,
-            title: 'Spiritual Guidance',
-            description: 'Exclusive Umrah preparation seminars and learning sessions. Our knowledgeable guides provide religious insights and support throughout your sacred journey.'
-        },
-        {
-            icon: <GraduationCap className="w-8 h-8" />,
-            title: 'Educational Sessions',
-            description: 'Pre-departure seminars to prepare you spiritually and practically. Learn the correct way to perform Umrah rituals, what to expect, and essential travel tips.'
-        },
-        {
-            icon: <HeadphonesIcon className="w-8 h-8" />,
-            title: '24/7 Support',
-            description: 'On-ground assistance from Danish and Arabic-speaking leaders. Round-the-clock support during your journey so you can focus on your spiritual experience with peace of mind.'
-        },
-        {
-            icon: <CreditCard className="w-8 h-8" />,
-            title: 'Flexible Payment Plans',
-            description: 'Affordable installment options with transparent pricing. We offer flexible payment plans to make your spiritual journey accessible without financial stress.'
-        },
-        {
-            icon: <Users className="w-8 h-8" />,
-            title: 'Group Coordination',
-            description: 'Travel with a supportive, faith-driven community. We create a family-like atmosphere where travelers support and uplift one another throughout the journey.'
-        },
-        {
-            icon: <Shield className="w-8 h-8" />,
-            title: 'Halal Guarantee',
-            description: 'All services operate in accordance with Islamic principles. We ensure halal practices throughout the journey, from food to accommodations and activities.'
-        },
-        {
-            icon: <Clock className="w-8 h-8" />,
-            title: 'Complete Travel Management',
-            description: 'End-to-end service from inquiry to return. We handle every detail of your pilgrimage, ensuring a smooth, authentic, and spiritually fulfilling experience.'
+    const [services, setServices] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchServices();
+    }, []);
+
+    const fetchServices = async () => {
+        try {
+            const data = await servicesApi.getAll();
+            setServices(data);
+        } catch (error) {
+            console.error('Failed to fetch services:', error);
+            // Fallback to default services if fetch fails
+            setServices([
+                {
+                    icon: '✈️',
+                    name: 'Flight Booking',
+                    description: 'Complete flight arrangements from Denmark to Saudi Arabia with trusted airlines. We handle all booking details to ensure comfortable and convenient travel for your sacred journey.'
+                },
+                {
+                    icon: '🏨',
+                    name: '4-5 Star Hotels',
+                    description: 'Luxury accommodation close to Haram in Makkah and Madinah. Stay in premium hotels within walking distance of the holy sites, allowing you to focus on worship without logistical concerns.'
+                },
+                {
+                    icon: '🛂',
+                    name: 'Visa Issuance',
+                    description: 'Seamless visa processing and arrangements. We handle all visa formalities and documentation, making the process hassle-free so you can prepare spiritually for your journey.'
+                },
+                {
+                    icon: '🚌',
+                    name: 'Ground Transport',
+                    description: 'Comfortable local transportation throughout your journey. Air-conditioned buses and vehicles for all transfers between airports, hotels, and holy sites.'
+                },
+                {
+                    icon: '🗺️',
+                    name: 'Seerah Tours',
+                    description: 'Guided visits to historical and religious sites in Makkah and Madinah. Learn about Islamic history while visiting significant locations from the life of Prophet Muhammad (PBUH).'
+                },
+                {
+                    icon: '📖',
+                    name: 'Spiritual Guidance',
+                    description: 'Exclusive Umrah preparation seminars and learning sessions. Our knowledgeable guides provide religious insights and support throughout your sacred journey.'
+                },
+                {
+                    icon: '🎓',
+                    name: 'Educational Sessions',
+                    description: 'Pre-departure seminars to prepare you spiritually and practically. Learn the correct way to perform Umrah rituals, what to expect, and essential travel tips.'
+                },
+                {
+                    icon: '📱',
+                    name: '24/7 Support',
+                    description: 'On-ground assistance from Danish and Arabic-speaking leaders. Round-the-clock support during your journey so you can focus on your spiritual experience with peace of mind.'
+                },
+                {
+                    icon: '💳',
+                    name: 'Flexible Payment Plans',
+                    description: 'Affordable installment options with transparent pricing. We offer flexible payment plans to make your spiritual journey accessible without financial stress.'
+                },
+                {
+                    icon: '👥',
+                    name: 'Group Coordination',
+                    description: 'Travel with a supportive, faith-driven community. We create a family-like atmosphere where travelers support and uplift one another throughout the journey.'
+                },
+                {
+                    icon: '🔒',
+                    name: 'Halal Guarantee',
+                    description: 'All services operate in accordance with Islamic principles. We ensure halal practices throughout the journey, from food to accommodations and activities.'
+                },
+                {
+                    icon: '⏰',
+                    name: 'Complete Travel Management',
+                    description: 'End-to-end service from inquiry to return. We handle every detail of your pilgrimage, ensuring a smooth, authentic, and spiritually fulfilling experience.'
+                }
+            ]);
+        } finally {
+            setLoading(false);
         }
-    ];
+    };
 
     return (
         <div className="pt-20">
@@ -114,45 +133,51 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
                         </p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {services.map((service, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 60, scale: 0.8, rotateX: -15 }}
-                                whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
-                                viewport={{ once: true, margin: "-50px" }}
-                                transition={{
-                                    duration: 1.2,
-                                    delay: index * 0.1,
-                                    ease: [0.25, 0.46, 0.45, 0.94]
-                                }}
-                                whileHover={{
-                                    y: -15,
-                                    scale: 1.05,
-                                    boxShadow: "0 25px 50px rgba(216, 167, 40, 0.3)",
-                                    transition: { duration: 0.5, ease: "easeOut" }
-                                }}
-                                className="relative bg-gradient-to-br from-card via-card to-card/80 p-8 rounded-2xl shadow-xl text-center border-2 border-[rgb(216,167,40)]/20 hover:border-[rgb(216,167,40)]/60 transition-all overflow-hidden group"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-br from-[rgb(216,167,40)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
+                    {loading ? (
+                        <div className="text-center py-12">Loading services...</div>
+                    ) : services.length === 0 ? (
+                        <div className="text-center py-12">No services available at the moment.</div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {services.map((service, index) => (
                                 <motion.div
-                                    className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[rgb(216,167,40)]/20 to-[rgb(186,137,10)]/10 text-[rgb(216,167,40)] mb-6 relative z-10"
-                                    whileHover={{ scale: 1.2, rotate: 360 }}
-                                    transition={{ duration: 0.8, type: "spring", stiffness: 150 }}
+                                    key={service.id || index}
+                                    initial={{ opacity: 0, y: 60, scale: 0.8, rotateX: -15 }}
+                                    whileInView={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+                                    viewport={{ once: true, margin: "-50px" }}
+                                    transition={{
+                                        duration: 1.2,
+                                        delay: index * 0.1,
+                                        ease: [0.25, 0.46, 0.45, 0.94]
+                                    }}
+                                    whileHover={{
+                                        y: -15,
+                                        scale: 1.05,
+                                        boxShadow: "0 25px 50px rgba(216, 167, 40, 0.3)",
+                                        transition: { duration: 0.5, ease: "easeOut" }
+                                    }}
+                                    className="relative bg-gradient-to-br from-card via-card to-card/80 p-8 rounded-2xl shadow-xl text-center border-2 border-[rgb(216,167,40)]/20 hover:border-[rgb(216,167,40)]/60 transition-all overflow-hidden group"
                                 >
-                                    {service.icon}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-[rgb(216,167,40)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                                    <motion.div
+                                        className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[rgb(216,167,40)]/20 to-[rgb(186,137,10)]/10 mb-6 relative z-10 text-4xl"
+                                        whileHover={{ scale: 1.2, rotate: 360 }}
+                                        transition={{ duration: 0.8, type: "spring", stiffness: 150 }}
+                                    >
+                                        {service.icon}
+                                    </motion.div>
+
+                                    <h3 className="text-xl mb-4 font-bold relative z-10">{service.name}</h3>
+                                    <p className="text-muted-foreground text-sm leading-relaxed relative z-10">
+                                        {service.description}
+                                    </p>
+
+                                    <div className="absolute top-0 right-0 w-20 h-20 bg-[rgb(216,167,40)]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
                                 </motion.div>
-
-                                <h3 className="text-xl mb-4 font-bold relative z-10">{service.title}</h3>
-                                <p className="text-muted-foreground text-sm leading-relaxed relative z-10">
-                                    {service.description}
-                                </p>
-
-                                <div className="absolute top-0 right-0 w-20 h-20 bg-[rgb(216,167,40)]/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
-                            </motion.div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 

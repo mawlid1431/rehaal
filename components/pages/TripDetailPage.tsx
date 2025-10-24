@@ -69,7 +69,7 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({ tripId, onNaviga
       {/* Hero Image */}
       <section className="relative h-96">
         <ImageWithFallback
-          src={trip.image}
+          src={trip.image_url}
           alt={trip.title}
           className="w-full h-full object-cover"
         />
@@ -89,7 +89,7 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({ tripId, onNaviga
               transition={{ delay: 0.2 }}
               className="inline-block bg-[rgb(216,167,40)] text-white px-6 py-3 rounded-full text-xl"
             >
-              {trip.price}
+              ${trip.price}
             </motion.div>
           </div>
         </div>
@@ -110,22 +110,54 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({ tripId, onNaviga
                 <p className="text-muted-foreground leading-relaxed">{trip.description}</p>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="mb-8"
-              >
-                <h2 className="text-2xl mb-4">What's Included</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {trip.includes.map((item, index) => (
-                    <div key={index} className="flex items-start space-x-3">
+              {trip.description && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mb-8"
+                >
+                  <h2 className="text-2xl mb-4">What's Included</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-start space-x-3">
                       <Check className="w-5 h-5 text-[rgb(216,167,40)] mt-0.5 flex-shrink-0" />
-                      <span className="text-muted-foreground">{item}</span>
+                      <span className="text-muted-foreground">Round-trip flights (Denmark ↔ Saudi Arabia)</span>
                     </div>
-                  ))}
-                </div>
-              </motion.div>
+                    <div className="flex items-start space-x-3">
+                      <Check className="w-5 h-5 text-[rgb(216,167,40)] mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Luxury hotels near Masjid al-Haram and Masjid an-Nabawi</span>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Check className="w-5 h-5 text-[rgb(216,167,40)] mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Umrah visa processing</span>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Check className="w-5 h-5 text-[rgb(216,167,40)] mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Local transportation during the trip</span>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Check className="w-5 h-5 text-[rgb(216,167,40)] mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Guided tours to historical and religious sites</span>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Check className="w-5 h-5 text-[rgb(216,167,40)] mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Danish-speaking travel leader</span>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Check className="w-5 h-5 text-[rgb(216,167,40)] mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Pre-departure Umrah seminar</span>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Check className="w-5 h-5 text-[rgb(216,167,40)] mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Seerah educational tours</span>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Check className="w-5 h-5 text-[rgb(216,167,40)] mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">Full travel management</span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -162,7 +194,7 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({ tripId, onNaviga
                       <Calendar className="w-5 h-5 text-[rgb(216,167,40)] mt-0.5" />
                       <div>
                         <p className="text-sm text-muted-foreground">Dates</p>
-                        <p>{trip.dates}</p>
+                        <p>{new Date(trip.start_date).toLocaleDateString()} - {new Date(trip.end_date).toLocaleDateString()}</p>
                       </div>
                     </div>
 
@@ -178,7 +210,7 @@ export const TripDetailPage: React.FC<TripDetailPageProps> = ({ tripId, onNaviga
                   <div className="border-t border-border pt-6 mb-6">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-muted-foreground">Price per person</span>
-                      <span className="text-2xl text-[rgb(216,167,40)]">{trip.price}</span>
+                      <span className="text-2xl text-[rgb(216,167,40)]">${trip.price}</span>
                     </div>
                   </div>
 

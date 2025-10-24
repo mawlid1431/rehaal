@@ -84,7 +84,7 @@ export const GalleryPage: React.FC = () => {
                     onClick={() => setSelectedImage(String(image.id))}
                   >
                     <ImageWithFallback
-                      src={image.url}
+                      src={image.image_url}
                       alt={image.title}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
@@ -151,7 +151,7 @@ export const GalleryPage: React.FC = () => {
               {galleryImages.find((img) => String(img.id) === selectedImage) && (
                 <div>
                   <ImageWithFallback
-                    src={galleryImages.find((img) => String(img.id) === selectedImage)!.url}
+                    src={galleryImages.find((img) => String(img.id) === selectedImage)!.image_url}
                     alt={galleryImages.find((img) => String(img.id) === selectedImage)!.title}
                     className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
                   />

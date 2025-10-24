@@ -130,32 +130,58 @@ ALTER TABLE gallery ENABLE ROW LEVEL SECURITY;
 ALTER TABLE testimonials ENABLE ROW LEVEL SECURITY;
 ALTER TABLE services ENABLE ROW LEVEL SECURITY;
 
--- Public read access for all tables
-CREATE POLICY "Allow public read on trips" ON trips FOR SELECT USING (true);
-CREATE POLICY "Allow public read on gallery" ON gallery FOR SELECT USING (true);
-CREATE POLICY "Allow public read on testimonials" ON testimonials FOR SELECT USING (true);
-CREATE POLICY "Allow public read on services" ON services FOR SELECT USING (true);
+-- ============================================
+-- PUBLIC ACCESS POLICIES (FOR DEVELOPMENT)
+-- WARNING: These allow anyone to modify data!
+-- For production, implement proper authentication
+-- ============================================
 
--- Authenticated users (admin) have full access
-CREATE POLICY "Allow authenticated full access on trips" ON trips
-  FOR ALL USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Allow authenticated full access on bookings" ON bookings
-  FOR ALL USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Allow authenticated full access on gallery" ON gallery
-  FOR ALL USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Allow authenticated full access on testimonials" ON testimonials
-  FOR ALL USING (auth.role() = 'authenticated');
-
-CREATE POLICY "Allow authenticated full access on services" ON services
-  FOR ALL USING (auth.role() = 'authenticated');
-
--- Allow public to create bookings (for booking form on website)
-CREATE POLICY "Allow public to create bookings" ON bookings
-  FOR INSERT WITH CHECK (true);
-
--- Allow public to read bookings
-CREATE POLICY "Allow public read on bookings" ON bookings
+-- TRIPS - Public access for all operations
+CREATE POLICY "Allow public read on trips" ON trips 
   FOR SELECT USING (true);
+CREATE POLICY "Allow public insert on trips" ON trips 
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update on trips" ON trips 
+  FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete on trips" ON trips 
+  FOR DELETE USING (true);
+
+-- GALLERY - Public access for all operations
+CREATE POLICY "Allow public read on gallery" ON gallery 
+  FOR SELECT USING (true);
+CREATE POLICY "Allow public insert on gallery" ON gallery 
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update on gallery" ON gallery 
+  FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete on gallery" ON gallery 
+  FOR DELETE USING (true);
+
+-- TESTIMONIALS - Public access for all operations
+CREATE POLICY "Allow public read on testimonials" ON testimonials 
+  FOR SELECT USING (true);
+CREATE POLICY "Allow public insert on testimonials" ON testimonials 
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update on testimonials" ON testimonials 
+  FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete on testimonials" ON testimonials 
+  FOR DELETE USING (true);
+
+-- SERVICES - Public access for all operations
+CREATE POLICY "Allow public read on services" ON services 
+  FOR SELECT USING (true);
+CREATE POLICY "Allow public insert on services" ON services 
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update on services" ON services 
+  FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete on services" ON services 
+  FOR DELETE USING (true);
+
+-- BOOKINGS - Public access for all operations
+CREATE POLICY "Allow public read on bookings" ON bookings 
+  FOR SELECT USING (true);
+CREATE POLICY "Allow public insert on bookings" ON bookings 
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update on bookings" ON bookings 
+  FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete on bookings" ON bookings 
+  FOR DELETE USING (true);
