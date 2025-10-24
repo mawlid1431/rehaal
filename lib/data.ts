@@ -3,19 +3,19 @@
 export const heroSlides = [
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1720549973451-018d3623b55a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYWtrYWglMjBrYWFiYSUyMG1vc3F1ZXxlbnwxfHx8fDE3NjEyNDAzMDl8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: '/Public/Assents/main/BG1.jpg',
     title: 'Din Åndelige Rejse Begynder Her',
     subtitle: 'Oplev Umrah med Rehaal Rejser - Danmarks betroede muslimske rejsebureau med over 500 tilfredse pilgrimme'
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1733895422344-672960e0de80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYWRpbmFoJTIwbW9zcXVlJTIwaXNsYW1pY3xlbnwxfHx8fDE3NjEyNDAzMTB8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: '/Public/Assents/main/BG-2.jpg',
     title: 'Besøg De Hellige Byer',
     subtitle: 'Makkah og Madinah med dansk-talende ledere, luksushoteller nær Haram, og komplet vejledning'
   },
   {
     id: 3,
-    image: 'https://images.unsplash.com/photo-1759994976016-cd0799b2f480?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1bXJhaCUyMHBpbGdyaW1hZ2UlMjB0cmF2ZWx8ZW58MXx8fHwxNzYxMjQwMzExfDA&ixlib=rb-4.1.0&q=80&w=1080',
+    image: '/Public/Assents/main/BG-3.jpg',
     title: 'En Livs-Forandrende Oplevelse',
     subtitle: 'Eksklusivt Umrah-seminar, Seerah-ture, og fællesskabsånd - alt inkluderet fra 17.000 DKK'
   }

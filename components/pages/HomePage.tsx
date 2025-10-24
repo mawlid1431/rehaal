@@ -21,10 +21,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [loading, setLoading] = useState(true);
 
   const motivationalBackgrounds = [
-    'https://images.unsplash.com/photo-1591604466107-ec97de577aff?q=80&w=2071',
-    'https://images.unsplash.com/photo-1720549973451-018d3623b55a?q=80&w=2071',
-    'https://images.unsplash.com/photo-1733895422344-672960e0de80?q=80&w=2071',
-    'https://images.unsplash.com/photo-1759994976016-cd0799b2f480?q=80&w=2071'
+    '/Public/Assents/main/BG_below.jpg'
   ];
 
   React.useEffect(() => {

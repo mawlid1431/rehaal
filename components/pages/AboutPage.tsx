@@ -14,7 +14,7 @@ export const AboutPage: React.FC = () => {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1632782532013-bd3f5f9197db?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpc2xhbWljJTIwYXJjaGl0ZWN0dXJlfGVufDF8fHx8MTc2MTIyMzEzOHww&ixlib=rb-4.1.0&q=80&w=1080)'
+            backgroundImage: 'url(/Public/Assents/main/about_1.jpg)'
           }}
         />
         <div className="absolute inset-0 bg-black/60" />
@@ -59,8 +59,8 @@ export const AboutPage: React.FC = () => {
               className="relative h-96 rounded-xl overflow-hidden shadow-2xl"
             >
               <ImageWithFallback
-                src="https://images.unsplash.com/photo-1733895422344-672960e0de80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtYWRpbmFoJTIwbW9zcXVlJTIwaXNsYW1pY3xlbnwxfHx8fDE3NjEyNDAzMTB8MA&ixlib=rb-4.1.0&q=80&w=1080"
-                alt="Madinah"
+                src="/Public/Assents/main/about-2.jpg"
+                alt="About Rehaal"
                 className="w-full h-full object-cover"
               />
             </motion.div>

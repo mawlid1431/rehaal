@@ -97,7 +97,7 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
                 <div
                     className="absolute inset-0 bg-cover bg-center"
                     style={{
-                        backgroundImage: 'url(https://images.unsplash.com/photo-1591604466107-ec97de577aff?q=80&w=2071)',
+                        backgroundImage: 'url(/Public/Assents/main/Sercive_1.jpg)',
                         backgroundSize: 'cover',
                         backgroundPosition: 'center'
                     }}
@@ -187,7 +187,7 @@ export const ServicesPage: React.FC<ServicesPageProps> = ({ onNavigate }) => {
                     <div
                         className="absolute inset-0 bg-cover bg-center"
                         style={{
-                            backgroundImage: 'url(https://images.unsplash.com/photo-1720549973451-018d3623b55a?q=80&w=2071)',
+                            backgroundImage: 'url(/Public/Assents/main/Service_2.jpg)',
                         }}
                     />
                 </div>
