@@ -21,7 +21,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [loading, setLoading] = useState(true);
 
   const motivationalBackgrounds = [
-    '/Public/Assents/main/BG_below.jpg'
+    '/Assents/main/BG_below.jpg'
   ];
 
   React.useEffect(() => {

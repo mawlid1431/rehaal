@@ -3,19 +3,19 @@
 export const heroSlides = [
   {
     id: 1,
-    image: '/Public/Assents/main/BG1.jpg',
+    image: '/Assents/main/BG1.jpg',
     title: 'Din Åndelige Rejse Begynder Her',
     subtitle: 'Oplev Umrah med Rehaal Rejser - Danmarks betroede muslimske rejsebureau med over 500 tilfredse pilgrimme'
   },
   {
     id: 2,
-    image: '/Public/Assents/main/BG-2.jpg',
+    image: '/Assents/main/BG-2.jpg',
     title: 'Besøg De Hellige Byer',
     subtitle: 'Makkah og Madinah med dansk-talende ledere, luksushoteller nær Haram, og komplet vejledning'
   },
   {
     id: 3,
-    image: '/Public/Assents/main/BG-3.jpg',
+    image: '/Assents/main/BG-3.jpg',
     title: 'En Livs-Forandrende Oplevelse',
     subtitle: 'Eksklusivt Umrah-seminar, Seerah-ture, og fællesskabsånd - alt inkluderet fra 17.000 DKK'
   }

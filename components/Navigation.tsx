@@ -59,9 +59,9 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onNavigate 
             onClick={() => onNavigate('home')}
           >
             <img
-              src={isDarkMode ? '/Public/Assents/Logos/Darkmode-on.png' : '/Public/Assents/Logos/Lighmode_on.png'}
+              src={isDarkMode ? '/Assents/Logos/Darkmode-on.png' : '/Assents/Logos/Lighmode_on.png'}
               alt="Rehaal Travel Logo"
-              className="h-12 w-auto object-contain"
+              className="h-10 sm:h-12 w-auto object-contain"
             />
           </motion.div>
 

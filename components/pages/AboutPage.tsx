@@ -14,7 +14,7 @@ export const AboutPage: React.FC = () => {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url(/Public/Assents/main/about_1.jpg)'
+            backgroundImage: 'url(/Assents/main/about_1.jpg)'
           }}
         />
         <div className="absolute inset-0 bg-black/60" />
@@ -59,7 +59,7 @@ export const AboutPage: React.FC = () => {
               className="relative h-96 rounded-xl overflow-hidden shadow-2xl"
             >
               <ImageWithFallback
-                src="/Public/Assents/main/about-2.jpg"
+                src="/Assents/main/about-2.jpg"
                 alt="About Rehaal"
                 className="w-full h-full object-cover"
               />

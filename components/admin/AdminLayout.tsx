@@ -49,9 +49,9 @@ export function AdminLayout({ children, currentSection, onSectionChange, onLogou
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center">
                             <img
-                                src={isDarkMode ? '/Public/Assents/Logos/Darkmode-on.png' : '/Public/Assents/Logos/Lighmode_on.png'}
+                                src={isDarkMode ? '/Assents/Logos/Darkmode-on.png' : '/Assents/Logos/Lighmode_on.png'}
                                 alt="Rehaal Admin Logo"
-                                className="h-10 w-auto object-contain"
+                                className="h-8 sm:h-10 w-auto object-contain"
                             />
                         </div>
                         <div className="hidden md:block flex-1"></div>
