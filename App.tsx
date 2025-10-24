@@ -3,6 +3,7 @@ import { DarkModeProvider, LanguageProvider } from './lib/contexts';
 import { Navigation } from './components/Navigation';
 import { Footer } from './components/Footer';
 import { WhatsAppButton } from './components/WhatsAppButton';
+import { LoadingScreen } from './components/LoadingScreen';
 import { HomePage } from './components/pages/HomePage';
 import { AboutPage } from './components/pages/AboutPage';
 import { TripsPage } from './components/pages/TripsPage';
@@ -21,6 +22,12 @@ import { Toaster } from './components/ui/sonner';
 type Page = 'home' | 'about' | 'services' | 'trips' | 'trip-detail' | 'booking' | 'gallery' | 'testimonials' | 'contact' | 'faq' | 'terms' | 'privacy' | 'admin';
 
 export default function App() {
+  const [isLoading, setIsLoading] = useState(() => {
+    // Check if user has visited before
+    const hasVisited = sessionStorage.getItem('hasVisited');
+    return !hasVisited;
+  });
+
   const [currentPage, setCurrentPage] = useState<Page>(() => {
     // Check if URL is /admin
     if (window.location.pathname === '/admin') {
@@ -49,6 +56,17 @@ export default function App() {
     // Smooth scroll behavior
     document.documentElement.style.scrollBehavior = 'smooth';
   }, []);
+
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+    // Mark that user has visited
+    sessionStorage.setItem('hasVisited', 'true');
+  };
+
+  // Show loading screen on first visit
+  if (isLoading) {
+    return <LoadingScreen onLoadingComplete={handleLoadingComplete} />;
+  }
 
   const renderPage = () => {
     switch (currentPage) {
