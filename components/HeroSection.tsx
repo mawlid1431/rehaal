@@ -29,33 +29,23 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onBookJourney }) => {
   }, []);
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-gray-100">
-      {/* Background Images Layer - Crossfade without gap */}
-      <AnimatePresence initial={false}>
+    <div className="relative h-screen w-full overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800">
+      {/* Background Images Layer - Same style as motivational section */}
+      <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: 0.15 }}
           exit={{ opacity: 0 }}
-          transition={{
-            duration: 2,
-            ease: "easeInOut"
-          }}
+          transition={{ duration: 2, ease: "easeInOut" }}
           className="absolute inset-0"
         >
-          <motion.div
-            className="absolute inset-0 bg-cover bg-center"
+          <div
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-[8000ms] ease-in-out scale-105"
             style={{
               backgroundImage: `url(${heroSlides[currentSlide].image})`,
             }}
-            initial={{ scale: 1 }}
-            animate={{ scale: 1.08 }}
-            transition={{
-              duration: 8,
-              ease: "linear"
-            }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/40" />
         </motion.div>
       </AnimatePresence>
 
@@ -70,12 +60,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onBookJourney }) => {
           >
             <TypewriterText
               texts={slogans}
-              typingSpeed={80}
-              deletingSpeed={40}
-              pauseTime={2500}
-              className="text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-black px-6 leading-tight"
+              typingSpeed={120}
+              deletingSpeed={60}
+              pauseTime={3000}
+              className="text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white px-6 leading-tight"
               style={{
-                textShadow: '3px 3px 8px rgba(255, 255, 255, 0.6), -1px -1px 4px rgba(255, 255, 255, 0.3)',
+                textShadow: '3px 3px 8px rgba(0, 0, 0, 0.8), -1px -1px 4px rgba(0, 0, 0, 0.5)',
                 fontFamily: '"Playfair Display", "Georgia", serif'
               }}
             />
@@ -107,7 +97,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onBookJourney }) => {
             onClick={() => setCurrentSlide(index)}
             className={`w-3 h-3 rounded-full transition-all ${index === currentSlide
               ? 'bg-[rgb(216,167,40)] w-8'
-              : 'bg-black/50 hover:bg-black/75'
+              : 'bg-white/50 hover:bg-white/75'
               }`}
           />
         ))}
