@@ -9,7 +9,7 @@ import { tripsApi, bookingsApi } from '../../lib/api';
 import { toast } from 'sonner';
 
 interface BookingPageProps {
-    tripId: number;
+    tripId: number | string;
     onNavigate: (page: string) => void;
 }
 

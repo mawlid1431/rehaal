@@ -5,7 +5,7 @@ import { tripsApi } from '../../lib/api';
 import { useState, useEffect } from 'react';
 
 interface TripsPageProps {
-  onNavigate: (page: string, id?: number) => void;
+  onNavigate: (page: string, id?: number | string) => void;
 }
 
 export const TripsPage: React.FC<TripsPageProps> = ({ onNavigate }) => {

@@ -28,9 +28,9 @@ export default function App() {
     }
     return 'home';
   });
-  const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
+  const [selectedTripId, setSelectedTripId] = useState<number | string | null>(null);
 
-  const handleNavigate = (page: string, id?: number) => {
+  const handleNavigate = (page: string, id?: number | string) => {
     setCurrentPage(page as Page);
     if (id) {
       setSelectedTripId(id);

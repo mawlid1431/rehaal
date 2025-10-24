@@ -183,11 +183,6 @@ function TripForm({ trip, onClose, onSave }: {
     });
     const [uploading, setUploading] = useState(false);
 
-    // Check if trip is past or upcoming
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const isPast = formData.end_date ? new Date(formData.end_date) < today : false;
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         onSave(formData);

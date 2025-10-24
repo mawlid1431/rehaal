@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Shield, User, Mail, Key, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit, Trash2, Shield, User, Mail, Eye, EyeOff } from 'lucide-react';
 import { adminUsersApi } from '../../lib/api';
-import { hashPassword, getAuthUser } from '../../lib/auth';
+import { getAuthUser } from '../../lib/auth';
 import { toast } from 'sonner';
+
+// Simple hash function for demo
+const hashPassword = async (password: string): Promise<string> => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password + 'salt_key_change_this');
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
 
 export function UsersManager() {
     const [users, setUsers] = useState<any[]>([]);

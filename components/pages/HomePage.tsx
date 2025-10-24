@@ -9,7 +9,7 @@ import { servicesApi, tripsApi, testimonialsApi } from '../../lib/api';
 import { useState, useEffect } from 'react';
 
 interface HomePageProps {
-  onNavigate: (page: string, id?: number) => void;
+  onNavigate: (page: string, id?: number | string) => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {

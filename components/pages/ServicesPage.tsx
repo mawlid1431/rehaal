@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plane, Hotel, FileCheck, Bus, MapPin, BookOpen, GraduationCap, HeadphonesIcon, CreditCard, Users, Shield, Clock } from 'lucide-react';
 import { Button } from '../ui/button';
 import { servicesApi } from '../../lib/api';
 

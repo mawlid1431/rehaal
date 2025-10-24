@@ -8,8 +8,8 @@ import { useState, useEffect } from 'react';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 interface TripDetailPageProps {
-  tripId: number;
-  onNavigate: (page: string, id?: number) => void;
+  tripId: number | string;
+  onNavigate: (page: string, id?: number | string) => void;
 }
 
 export const TripDetailPage: React.FC<TripDetailPageProps> = ({ tripId, onNavigate }) => {
