@@ -291,16 +291,6 @@ function TripForm({ trip, onClose, onSave }: {
                             </p>
                         </div>
 
-                        {/* Auto-detected Category Indicator */}
-                        {formData.end_date && (
-                            <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800">
-                                <p className="text-sm text-blue-700 dark:text-blue-300">
-                                    <strong>Auto-detected:</strong> Based on end date, this trip is {isPast ? 'Past' : 'Upcoming'}.
-                                    You can override this with the category selector above.
-                                </p>
-                            </div>
-                        )}
-
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">

@@ -76,25 +76,48 @@ export const BookingPage: React.FC<BookingPageProps> = ({ tripId, onNavigate }) 
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        try {
+            // Create booking object matching database schema
+            const bookingData = {
+                trip_id: tripId.toString(),
+                customer_name: formData.fullName,
+                customer_email: formData.email,
+                customer_phone: formData.phone,
+                number_of_people: parseInt(formData.numberOfTravelers),
+                booking_date: new Date().toISOString(),
+                special_requests: `
+Address: ${formData.address}
+Date of Birth: ${formData.dateOfBirth}
+Passport Number: ${formData.passportNumber}
+Emergency Contact: ${formData.emergencyContact} (${formData.emergencyPhone})
+${formData.specialRequests ? `\nSpecial Requests: ${formData.specialRequests}` : ''}
+                `.trim(),
+                status: 'pending' as const,
+                total_price: trip.price * parseInt(formData.numberOfTravelers)
+            };
 
-        toast.success('Booking request submitted successfully! We will contact you shortly.');
-        setIsSubmitting(false);
+            await bookingsApi.create(bookingData);
+            toast.success('Booking request submitted successfully! We will contact you shortly.');
 
-        // Reset form
-        setFormData({
-            fullName: '',
-            email: '',
-            phone: '',
-            address: '',
-            numberOfTravelers: '1',
-            specialRequests: '',
-            passportNumber: '',
-            dateOfBirth: '',
-            emergencyContact: '',
-            emergencyPhone: ''
-        });
+            // Reset form
+            setFormData({
+                fullName: '',
+                email: '',
+                phone: '',
+                address: '',
+                numberOfTravelers: '1',
+                specialRequests: '',
+                passportNumber: '',
+                dateOfBirth: '',
+                emergencyContact: '',
+                emergencyPhone: ''
+            });
+        } catch (error) {
+            console.error('Booking error:', error);
+            toast.error('Failed to submit booking. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (

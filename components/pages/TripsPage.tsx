@@ -91,10 +91,11 @@ export const TripsPage: React.FC<TripsPageProps> = ({ onNavigate }) => {
               onClick={() => setActiveFilter('all')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 ${activeFilter === 'all'
-                ? 'bg-gradient-to-r from-[rgb(216,167,40)] to-[rgb(186,137,10)] text-white shadow-xl'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-[rgb(216,167,40)] hover:shadow-lg'
-                }`}
+              className={
+                activeFilter === 'all'
+                  ? 'px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 bg-gradient-to-r from-[rgb(216,167,40)] to-[rgb(186,137,10)] text-white shadow-xl'
+                  : 'px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-[rgb(216,167,40)] hover:shadow-lg'
+              }
             >
               All Trips <span className="ml-2 opacity-75">({trips.length})</span>
             </motion.button>
@@ -102,10 +103,11 @@ export const TripsPage: React.FC<TripsPageProps> = ({ onNavigate }) => {
               onClick={() => setActiveFilter('upcoming')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 ${activeFilter === 'upcoming'
-                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-xl'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-green-500 hover:shadow-lg'
-                }`}
+              className={
+                activeFilter === 'upcoming'
+                  ? 'px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 bg-gradient-to-r from-green-500 to-green-600 text-white shadow-xl'
+                  : 'px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-green-500 hover:shadow-lg'
+              }
             >
               Upcoming <span className="ml-2 opacity-75">({upcomingTrips.length})</span>
             </motion.button>
@@ -113,10 +115,11 @@ export const TripsPage: React.FC<TripsPageProps> = ({ onNavigate }) => {
               onClick={() => setActiveFilter('past')}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className={`px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 ${activeFilter === 'past'
-                ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-xl'
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-gray-500 hover:shadow-lg'
-                }`}
+              className={
+                activeFilter === 'past'
+                  ? 'px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-xl'
+                  : 'px-10 py-3.5 rounded-xl font-semibold transition-all duration-300 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-200 dark:border-gray-700 hover:border-gray-500 hover:shadow-lg'
+              }
             >
               Past <span className="ml-2 opacity-75">({pastTrips.length})</span>
             </motion.button>
